@@ -38,7 +38,7 @@ class AITutorService:
                             "maxOutputTokens": 800
                         }
                     },
-                    timeout=10.0
+                    timeout=30.0
                 )
                 
                 if response.status_code == 200:
