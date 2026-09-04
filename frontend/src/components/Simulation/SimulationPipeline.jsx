@@ -9,7 +9,8 @@ import {
     StepScoreCandidates,
     StepRankCandidates,
     StepEducationalDeepDive,
-    StepFinalRecommendation
+    StepFinalRecommendation,
+    StepExplainPlan
 } from './SimulationSteps';
 import './Simulation.css';
 
@@ -22,10 +23,11 @@ const STEPS = [
     { id: 5, label: "Score Candidates", title: "Heuristic Scoring" },
     { id: 6, label: "Rank Candidates", title: "Rank & Threshold" },
     { id: 7, label: "Deep Dive", title: "Educational Breakdown" },
-    { id: 8, label: "Recommendation", title: "Final Recommendation" }
+    { id: 8, label: "Recommendation", title: "Final Recommendation" },
+    { id: 9, label: "MySQL EXPLAIN", title: "Actual Optimizer Plan" }
 ];
 
-export default function SimulationPipeline({ query, analysis, recommendations, schemaData, onReset }) {
+export default function SimulationPipeline({ query, analysis, recommendations, schemaData, explainData, explainError, onReset }) {
     const [currentStep, setCurrentStep] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
     const timerRef = useRef(null);
@@ -67,6 +69,7 @@ export default function SimulationPipeline({ query, analysis, recommendations, s
             case 6: return <StepRankCandidates recommendations={recommendations} />;
             case 7: return <StepEducationalDeepDive recommendations={recommendations} analysis={analysis} />;
             case 8: return <StepFinalRecommendation recommendations={recommendations} />;
+            case 9: return <StepExplainPlan explainData={explainData} explainError={explainError} />;
             default: return <div>Unknown Step</div>;
         }
     };

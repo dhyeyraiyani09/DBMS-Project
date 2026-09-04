@@ -107,3 +107,7 @@
 }
 ```
 - **Errors:** 400 Bad Request (Invalid SQL), 404 Not Found (Missing Schema), 500 Internal Error.
+
+## EXPLAIN Engine
+* **Endpoint:** `POST /api/explain/`
+* **Purpose:** Safely evaluates MySQL `EXPLAIN FORMAT=TRADITIONAL` for AST-validated read-only `SELECT` queries returning mapped optimizer properties distinguishing heuristics from execution realities.

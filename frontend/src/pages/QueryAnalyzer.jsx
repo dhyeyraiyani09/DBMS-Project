@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { getSchemas, getSchema } from '../services/schemaApi';
 import { analyzeQuery } from '../services/queryApi';
 import { getRecommendations } from '../services/recommendationApi';
+import { explainQuery } from '../services/explainApi';
 import SimulationPipeline from '../components/Simulation/SimulationPipeline';
 
 function QueryAnalyzer() {
@@ -14,6 +15,9 @@ function QueryAnalyzer() {
     const [analysis, setAnalysis] = useState(null);
     const [recommendations, setRecommendations] = useState(null);
     const [schemaData, setSchemaData] = useState(null);
+    const [explainData, setExplainData] = useState(null);
+    const [explainError, setExplainError] = useState(null);
+
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -35,6 +39,9 @@ function QueryAnalyzer() {
         setAnalysis(null);
         setRecommendations(null);
         setSchemaData(null);
+        setExplainData(null);
+        setExplainError(null);
+
         setIsSimulating(false);
         setIsLoading(true);
 
@@ -55,10 +62,17 @@ function QueryAnalyzer() {
                 getRecommendations(query, schemaId),
                 getSchema(schemaId)
             ]);
-
+            
             setAnalysis(analysisData);
             setRecommendations(recData);
             setSchemaData(fullSchema);
+            
+            try {
+                const expData = await explainQuery(query);
+                setExplainData(expData);
+            } catch (expErr) {
+                setExplainError(expErr.message);
+            }
         } catch (err) {
             setError(err.message);
         } finally {
@@ -138,6 +152,9 @@ function QueryAnalyzer() {
                     analysis={analysis}
                     recommendations={recommendations}
                     schemaData={schemaData}
+                    explainData={explainData}
+                    explainError={explainError}
+
                     onReset={() => setIsSimulating(false)}
                 />
             )}

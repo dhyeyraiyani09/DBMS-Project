@@ -293,3 +293,71 @@ export const StepFinalRecommendation = ({ recommendations }) => {
         </div>
     );
 };
+
+// STEP 9
+export const StepExplainPlan = ({ explainData, explainError }) => {
+    return (
+        <div className="step-container fade-in">
+            <h4>MySQL Optimizer EXPLAIN Plan</h4>
+            <div className="explain-panel">
+                <p className="educational-note">
+                    <strong>Note:</strong> While the previous step ("Recommendation") answers "What index does our deterministic engine suggest?", 
+                    this step answers "What is MySQL's actual optimizer doing for this query?". They are related but distinct.
+                </p>
+                
+                {explainError ? (
+                    <div className="status-badge error" style={{padding: '1rem', marginTop: '1rem'}}>
+                        <strong>EXPLAIN Failed:</strong> {explainError}
+                    </div>
+                ) : !explainData || !explainData.explain_rows || explainData.explain_rows.length === 0 ? (
+                    <p>Loading or no EXPLAIN data available.</p>
+                ) : (
+                    <div style={{overflowX: 'auto'}}>
+                        <table className="ranking-table explain-table" style={{marginTop: '1rem', fontSize: '0.85rem'}}>
+                            <thead>
+                                <tr>
+                                    <th>Table</th>
+                                    <th>Access Type</th>
+                                    <th>Possible Keys</th>
+                                    <th>Chosen Key</th>
+                                    <th>Rows</th>
+                                    <th>Extra</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {explainData.explain_rows.map((row, i) => (
+                                    <tr key={i}>
+                                        <td><strong>{row.table}</strong></td>
+                                        <td><span className="status-badge" style={{background: '#34495e'}}>{row.type}</span></td>
+                                        <td>{row.possible_keys || 'NULL'}</td>
+                                        <td><strong>{row.key || 'NULL'}</strong></td>
+                                        <td>{row.rows}</td>
+                                        <td>{row.Extra}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        
+                        <h5 style={{marginTop: '2rem'}}>Plan Interpretation</h5>
+                        <div className="operations-grid">
+                            {explainData.explain_rows.map((row, i) => (
+                                <div key={i} className="op-card">
+                                    <strong>{row.table}</strong>
+                                    <p style={{margin: '0.5rem 0', color: '#555'}}>{row.interpretation || 'No specific interpretation available.'}</p>
+                                    {row.type === 'ALL' && !row.key && (
+                                        <p style={{fontSize: '0.8rem', color: '#e74c3c'}}>
+                                            MySQL is currently not using an index here. Applying the recommended index may provide the optimizer with a faster access path.
+                                        </p>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
+            <div className="educational-note" style={{marginTop: '1.5rem', borderLeftColor: '#f39c12', background: '#fdfaee'}}>
+                <strong>Performance Timing:</strong> Actual execution timing (measured in ms) is not implemented in this simulator phase to prevent unsafe execution of arbitrary queries. EXPLAIN plan analysis allows safe optimizer projection without risking database locks.
+            </div>
+        </div>
+    );
+};

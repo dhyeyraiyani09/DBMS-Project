@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased] - Phase 4 Complete
 
+## [Phase 6 Complete]
+### Added
+- **EXPLAIN API Engine:** Implemented `/api/explain/` securely proxying SELECT-only queries via PyMySQL leveraging AST validation bounds preventing destructive payload execution natively.
+- **Normalization Layer:** Added educational `type` interpretations evaluating physical MySQL optimizer plans (const, eq_ref, ALL, range).
+- **Visualization Step:** Integrated EXPLAIN Step 9 into `SimulationSteps.jsx` natively parsing query components distinguishing explicitly between Heuristic Suggestions and physical optimizer paths.
+- **Documentation:** Created `phase-6-implementation.md` enforcing explicitly transparent execution boundaries.
+
+
 ## [Phase 5 Complete]
 ### Added
 - **Simulation Orchestrator:** Implemented `SimulationPipeline.jsx` managing an interactive 9-step educational visualization state machine.

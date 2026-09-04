@@ -75,9 +75,11 @@ http://127.0.0.1:8000/api/health
 ```
 
 ## Current Development Phase
-**Phase 5 — Visualization & Interactive Simulation**
+**Phase 6 — EXPLAIN & Performance Analysis**
 
 Phase 5 introduces a robust React-driven interactive simulation pipeline, transforming the deterministic index recommendations into an educational step-by-step visualizer. It displays exactly how operations are detected, how candidates are scored, explains left-prefix coverages, and visualizes optimal composite ordering combinations.
+Phase 6 seamlessly integrates actual MySQL EXPLAIN metrics enforcing stringent safety protocols to allow transparent optimizer projection comparing deterministic heuristics against true execution plans natively.
+
 
 
 ### What has NOT been implemented yet:

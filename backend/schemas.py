@@ -174,3 +174,26 @@ class RecommendationResponse(BaseModel):
     analysis_summary: QueryAnalysisResponse
     candidates: List[IndexCandidateResponse]
     recommendations: List[IndexCandidateResponse]
+
+# --- Explain Engine ---
+class ExplainRequest(BaseModel):
+    query: str
+
+class ExplainRow(BaseModel):
+    id: Optional[Any] = None
+    select_type: Optional[str] = None
+    table: Optional[str] = None
+    type: Optional[str] = None
+    possible_keys: Optional[str] = None
+    key: Optional[str] = None
+    key_len: Optional[str] = None
+    ref: Optional[str] = None
+    rows: Optional[Any] = None
+    filtered: Optional[Any] = None
+    Extra: Optional[str] = None
+    interpretation: Optional[str] = None
+
+class ExplainResponse(BaseModel):
+    success: bool
+    explain_rows: List[ExplainRow]
+    summary: str
