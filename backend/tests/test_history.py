@@ -55,3 +55,51 @@ def test_history_workflow():
     
     res8 = client.get(f"/api/history/{h_id}")
     assert res8.status_code == 404
+
+def test_history_special_characters():
+    payload = {
+        "title": "José's Analysis",
+        "schema_id": None,
+        "query": "SELECT * FROM users WHERE name = 'José'",
+        "analysis_result": {"tables": [{"name": "users"}]},
+        "recommendation_result": {"candidates": []},
+        "explain_result": None # Test null explain_result as required
+    }
+    res = client.post("/api/history/", json=payload)
+    assert res.status_code == 200
+    h_id = res.json()["id"]
+
+    # Retrieve Detail to check None EXPLAIN is handled
+    res_get = client.get(f"/api/history/{h_id}")
+    assert res_get.status_code == 200
+    assert res_get.json()["explain_result"] is None
+    
+    # Reports should not crash with special characters
+    txt_res = client.get(f"/api/history/{h_id}/report?format=txt")
+    assert txt_res.status_code == 200
+    
+    pdf_res = client.get(f"/api/history/{h_id}/report?format=pdf")
+    assert pdf_res.status_code == 200
+    
+    docx_res = client.get(f"/api/history/{h_id}/report?format=docx")
+    assert docx_res.status_code == 200
+    
+    # Clean up
+    client.delete(f"/api/history/{h_id}")
+
+def test_nonexistent_history():
+    res = client.get("/api/history/99999999")
+    assert res.status_code == 404
+    
+    res = client.delete("/api/history/99999999")
+    assert res.status_code == 404
+
+def test_history_list_no_large_payload():
+    res = client.get("/api/history/")
+    assert res.status_code == 200
+    if len(res.json()) > 0:
+        item = res.json()[0]
+        # Should contain summary metadata only, not huge JSON results
+        assert "analysis_result" not in item
+        assert "recommendation_result" not in item
+        assert "explain_result" not in item
