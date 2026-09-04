@@ -61,5 +61,7 @@ def analyze_query(request: schemas.QueryAnalysisRequest, db: Session = Depends(g
         raise HTTPException(status_code=400, detail=str(e))
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException as e:
+        raise e
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An unexpected error occurred during analysis: {str(e)}")

@@ -88,6 +88,8 @@ class QueryAnalyzer:
         # find_all with exp.Condition covers EQ, GT, LT, IN, LIKE, etc.
         # But we specifically want the granular binary/unary expressions
         for node in where_clause.find_all((exp.Binary, exp.In, exp.Between, exp.Is)):
+            if isinstance(node, (exp.And, exp.Or)):
+                continue
             # Only process if it's directly evaluating columns
             cols = list(node.find_all(exp.Column))
             if not cols:
