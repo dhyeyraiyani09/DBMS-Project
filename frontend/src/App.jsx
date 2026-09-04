@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { checkBackendHealth } from './services/api'
 import SchemaManager from './pages/SchemaManager'
+import QueryAnalyzer from './pages/QueryAnalyzer'
 
 function App() {
   const [healthStatus, setHealthStatus] = useState('checking...');
@@ -29,6 +30,7 @@ function App() {
           <ul>
             <li><a href="#" onClick={() => setCurrentView('simulator')}>Simulator</a></li>
             <li><a href="#" onClick={() => setCurrentView('schema')}>Schema Management</a></li>
+            <li><a href="#" onClick={() => setCurrentView('analyzer')}>SQL Analyzer</a></li>
             <li><a href="#">Learn</a></li>
             <li><a href="#">History</a></li>
             <li><a href="#">Help</a></li>
@@ -48,6 +50,12 @@ function App() {
               <p>Backend API: <span className={`status-badge status-${healthStatus}`}>{healthStatus.toUpperCase()}</span></p>
               <p>MySQL Database: <span className={`status-badge status-${dbStatus === 'connected' ? 'connected' : 'error'}`}>{dbStatus.toUpperCase()}</span></p>
             </div>
+          </div>
+        )}
+
+        {currentView === 'analyzer' && (
+          <div className="card">
+            <QueryAnalyzer />
           </div>
         )}
 

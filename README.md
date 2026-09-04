@@ -7,12 +7,13 @@ An interactive educational system that analyzes SQL queries and demonstrates how
 - **Frontend:** React, Vite, JavaScript, CSS
 - **Backend:** Python, FastAPI, Uvicorn, SQLAlchemy
 - **Database:** MySQL
+- **SQL Parser:** sqlglot
 
 ## Folder Structure
 ```text
 index-recommendation-engine/
 ├── frontend/          # React + Vite application
-├── backend/           # FastAPI Python application (Models, Routers, Schemas)
+├── backend/           # FastAPI Python application (Models, Routers, Schemas, Services)
 ├── database/          # Database SQL scripts (schema.sql)
 ├── docs/              # Project architecture and planning docs
 ```
@@ -64,7 +65,9 @@ Open another terminal and run:
 cd frontend
 npm run dev
 ```
-The frontend will be available at `http://localhost:5173`. Navigate to **Schema Management** to start creating your mock database architectures.
+The frontend will be available at `http://localhost:5173`. 
+- Navigate to **Schema Management** to create your mock database architectures.
+- Navigate to **SQL Analyzer** to enter a query and analyze its structured AST components.
 
 ### Test Health Endpoint
 ```text
@@ -72,11 +75,12 @@ http://127.0.0.1:8000/api/health
 ```
 
 ## Current Development Phase
-**Phase 2 — Database & Schema Management**
+**Phase 3 — SQL Query Analyzer**
+
+*Note: The current SQL Query Analyzer identifies query structure and parses semantics. It does NOT yet score or recommend new indexes.*
 
 ### What has NOT been implemented yet:
-- SQL parser & clause extraction
-- Index recommendation algorithm & scoring
+- Index candidate generation & recommendation scoring (Phase 4)
 - Query optimization logic & EXPLAIN analysis
 - B-tree visualization
 - AI Tutor & History system

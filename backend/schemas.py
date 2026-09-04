@@ -1,5 +1,5 @@
-from pydantic import BaseModel, Field, constr
-from typing import List, Optional
+from pydantic import BaseModel, Field, ConfigDict
+from typing import List, Optional, Dict, Any
 from datetime import datetime
 
 # --- Columns ---
@@ -14,11 +14,9 @@ class ColumnCreate(ColumnBase):
     pass
 
 class ColumnResponse(ColumnBase):
+    model_config = ConfigDict(from_attributes=True)
     id: int
     table_id: int
-    
-    class Config:
-        from_attributes = True
 
 # --- Foreign Keys ---
 class ForeignKeyBase(BaseModel):
@@ -30,11 +28,9 @@ class ForeignKeyCreate(ForeignKeyBase):
     pass
 
 class ForeignKeyResponse(ForeignKeyBase):
+    model_config = ConfigDict(from_attributes=True)
     id: int
     table_id: int
-
-    class Config:
-        from_attributes = True
 
 # --- Indexes ---
 class IndexColumnBase(BaseModel):
@@ -45,10 +41,8 @@ class IndexColumnCreate(IndexColumnBase):
     pass
 
 class IndexColumnResponse(IndexColumnBase):
+    model_config = ConfigDict(from_attributes=True)
     id: int
-    
-    class Config:
-        from_attributes = True
 
 class IndexBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
@@ -59,12 +53,10 @@ class IndexCreate(IndexBase):
     columns: List[IndexColumnCreate]
 
 class IndexResponse(IndexBase):
+    model_config = ConfigDict(from_attributes=True)
     id: int
     table_id: int
     index_columns: List[IndexColumnResponse]
-
-    class Config:
-        from_attributes = True
 
 # --- Tables ---
 class TableBase(BaseModel):
@@ -75,14 +67,12 @@ class TableCreate(TableBase):
     pass
 
 class TableResponse(TableBase):
+    model_config = ConfigDict(from_attributes=True)
     id: int
     schema_id: int
     columns: List[ColumnResponse] = []
     foreign_keys: List[ForeignKeyResponse] = []
     indexes: List[IndexResponse] = []
-
-    class Config:
-        from_attributes = True
 
 # --- Schemas ---
 class SchemaBase(BaseModel):
@@ -93,10 +83,68 @@ class SchemaCreate(SchemaBase):
     pass
 
 class SchemaResponse(SchemaBase):
+    model_config = ConfigDict(from_attributes=True)
     id: int
     created_at: datetime
     updated_at: datetime
     tables: List[TableResponse] = []
 
-    class Config:
-        from_attributes = True
+# --- Query Analyzer ---
+class QueryAnalysisRequest(BaseModel):
+    query: str
+    schema_id: Optional[int] = None
+
+class TableRef(BaseModel):
+    name: str
+    alias: Optional[str] = None
+
+class ColumnRef(BaseModel):
+    name: str
+    table: Optional[str] = None
+    original_ref: Optional[str] = None
+
+class PredicateRef(BaseModel):
+    column: str
+    table: Optional[str] = None
+    operator: str
+    classification: str
+    expression_raw: str
+
+class JoinCondition(BaseModel):
+    left: str
+    right: str
+    operator: str
+
+class JoinRef(BaseModel):
+    join_type: str
+    table: str
+    alias: Optional[str] = None
+    conditions: List[JoinCondition] = []
+
+class OrderByRef(BaseModel):
+    column: str
+    table: Optional[str] = None
+    direction: str
+    sequence: int
+
+class GroupByRef(BaseModel):
+    column: str
+    table: Optional[str] = None
+    sequence: int
+
+class HavingRef(BaseModel):
+    expression_raw: str
+
+class QueryAnalysisResponse(BaseModel):
+    valid: bool
+    original_query: str
+    query_type: str
+    tables: List[TableRef] = []
+    columns: List[ColumnRef] = []
+    where_conditions: List[PredicateRef] = []
+    joins: List[JoinRef] = []
+    order_by: List[OrderByRef] = []
+    group_by: List[GroupByRef] = []
+    having: List[HavingRef] = []
+    distinct: bool = False
+    limit: Optional[str] = None

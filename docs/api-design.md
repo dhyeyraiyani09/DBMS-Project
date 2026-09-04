@@ -39,12 +39,33 @@
 
 ---
 
-## Planned for later phases
+## Implemented in Phase 3
 
 ### 9. `POST /api/queries/analyze`
-- **Purpose:** Analyze an SQL query against a schema and generate candidate indexes.
-- **Request:** `{"schema_id": 123, "query": "SELECT ...", "frequency": 10}`
-- **Response:** JSON detailing parsed operations, generated candidates.
+- **Purpose:** Analyze an SQL query against a schema (optional) to extract syntax structure.
+- **Request:** `{"query": "SELECT * FROM users WHERE age > 25;", "schema_id": 1}`
+- **Response:** JSON structured representation of query structure:
+```json
+{
+  "valid": true,
+  "original_query": "SELECT * FROM users WHERE age > 25;",
+  "query_type": "SELECT",
+  "tables": [{"name": "users", "alias": null}],
+  "columns": [{"name": "age", "table": "users", "original_ref": null}],
+  "where_conditions": [{"column": "age", "table": "users", "operator": "GT", "classification": "RANGE", "expression_raw": "age > 25"}],
+  "joins": [],
+  "order_by": [],
+  "group_by": [],
+  "having": [],
+  "distinct": false,
+  "limit": null
+}
+```
+- **Errors:** 400 Bad Request (Invalid SQL, Unsupported Query Type, Schema Validation Errors like missing tables/columns).
+
+---
+
+## Planned for later phases
 
 ### 10. `POST /api/recommendations`
 - **Purpose:** Trigger the scoring engine to rank candidates and produce the final recommendation.
