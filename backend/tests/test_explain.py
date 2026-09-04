@@ -53,10 +53,18 @@ def test_explain_api_invalid_query():
     assert "Only SELECT queries are allowed" in response.json()["detail"]
 
 def test_explain_api_valid_query():
-    # Because we created the 'orders' table in the test DB, this should execute.
-    response = client.post("/api/explain/", json={"query": "SELECT * FROM orders WHERE user_id = 5"})
+    response = client.post("/api/explain/", json={"query": "SELECT * FROM orders WHERE user_id = 1 ORDER BY order_date DESC"})
     assert response.status_code == 200
     data = response.json()
     assert data["success"] is True
     assert "explain_rows" in data
     assert isinstance(data["explain_rows"], list)
+    assert len(data["explain_rows"]) > 0
+    
+    row = data["explain_rows"][0]
+    assert row["table"] == "orders"
+    assert "type" in row
+    # Even if MySQL changes choice in future, these fields must be returned
+    assert "possible_keys" in row
+    assert "key" in row
+    assert "Extra" in row
