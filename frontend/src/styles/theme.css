@@ -1,0 +1,138 @@
+:root {
+  --bg-color: #f5f5f5;
+  --text-color: #333;
+  --header-bg: #2c3e50;
+  --header-text: white;
+  --card-bg: white;
+  --card-border: #e0e0e0;
+  --nav-link: #ecf0f1;
+  --sidebar-border: #ddd;
+  --sidebar-hover: #eee;
+  --input-bg: white;
+  --input-text: #333;
+  --input-border: #ccc;
+  --btn-primary-bg: #3498db;
+  --btn-primary-text: white;
+  --btn-secondary-bg: #7f8c8d;
+  --btn-secondary-text: white;
+  --table-border: #ccc;
+  --table-header-bg: #f9f9f9;
+  --table-row-border: #eee;
+  --code-bg: #fff;
+  --code-border: #ccc;
+  --edu-note-bg: #e9ecef;
+}
+
+[data-theme="dark"] {
+  --bg-color: #1a1a2e;
+  --text-color: #e0e0e0;
+  --header-bg: #0f3460;
+  --header-text: #e0e0e0;
+  --card-bg: #16213e;
+  --card-border: #0f3460;
+  --nav-link: #e0e0e0;
+  --sidebar-border: #333;
+  --sidebar-hover: #0f3460;
+  --input-bg: #1a1a2e;
+  --input-text: #e0e0e0;
+  --input-border: #333;
+  --btn-primary-bg: #0f3460;
+  --btn-primary-text: #e0e0e0;
+  --btn-secondary-bg: #333;
+  --btn-secondary-text: #e0e0e0;
+  --table-border: #444;
+  --table-header-bg: #1a1a2e;
+  --table-row-border: #333;
+  --code-bg: #1a1a2e;
+  --code-border: #444;
+  --edu-note-bg: #0f3460;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+header {
+  background-color: var(--header-bg);
+  color: var(--header-text);
+}
+
+nav a {
+  color: var(--nav-link);
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--text-color);
+}
+
+.schema-manager .sidebar {
+  border-right: 1px solid var(--sidebar-border);
+}
+
+.schema-manager .sidebar li:hover { 
+  background: var(--sidebar-hover); 
+}
+
+.schema-forms input, .schema-forms select { 
+  background: var(--input-bg);
+  color: var(--input-text);
+  border: 1px solid var(--input-border); 
+}
+
+.query-analyzer input, .query-analyzer select, .query-analyzer textarea {
+  background: var(--input-bg);
+  color: var(--input-text);
+  border: 1px solid var(--input-border);
+}
+
+button {
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+}
+
+.db-table {
+  border: 1px solid var(--header-bg);
+}
+
+.db-table-header {
+  background: var(--header-bg);
+  color: var(--header-text);
+}
+
+.db-table-body, .db-table-indexes {
+  background: var(--card-bg);
+}
+
+.db-column {
+  border-bottom: 1px solid var(--table-row-border);
+}
+
+table {
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid var(--table-border);
+}
+
+thead tr {
+  background-color: var(--table-header-bg);
+}
+
+code, pre {
+  background-color: var(--code-bg);
+  border: 1px solid var(--code-border);
+  color: var(--text-color);
+}
+
+.educational-note {
+  background-color: var(--edu-note-bg) !important;
+}
+
+.history-detail table, .history-detail th, .history-detail td {
+  border: 1px solid var(--table-border);
+}

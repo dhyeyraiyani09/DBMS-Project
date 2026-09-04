@@ -3,11 +3,31 @@ import { checkBackendHealth } from './services/api'
 import SchemaManager from './pages/SchemaManager'
 import QueryAnalyzer from './pages/QueryAnalyzer'
 import HistoryPage from './pages/History'
+import LearnPage from './pages/Learn'
+import HelpPage from './pages/Help'
+import DevelopedByPage from './pages/DevelopedBy'
 
 function App() {
   const [healthStatus, setHealthStatus] = useState('checking...');
   const [dbStatus, setDbStatus] = useState('checking...');
   const [currentView, setCurrentView] = useState('simulator');
+  const [theme, setTheme] = useState('light');
+
+  // Load theme from localStorage on initial render
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      setTheme(savedTheme);
+      document.body.setAttribute('data-theme', savedTheme);
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    document.body.setAttribute('data-theme', newTheme);
+  };
 
   useEffect(() => {
     const verifyHealth = async () => {
@@ -28,13 +48,31 @@ function App() {
       <header>
         <h1>Index Recommendation Engine</h1>
         <nav>
-          <ul>
-            <li><a href="#" onClick={() => setCurrentView('simulator')}>Simulator</a></li>
-            <li><a href="#" onClick={() => setCurrentView('schema')}>Schema Management</a></li>
-            <li><a href="#" onClick={() => setCurrentView('analyzer')}>SQL Analyzer</a></li>
-            <li><a href="#">Learn</a></li>
-            <li><a href="#" onClick={() => setCurrentView('history')}>History</a></li>
-            <li><a href="#">Help</a></li>
+          <ul style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+            <li><a href="#" onClick={(e) => { e.preventDefault(); setCurrentView('simulator'); }}>Simulator</a></li>
+            <li><a href="#" onClick={(e) => { e.preventDefault(); setCurrentView('schema'); }}>Schema Management</a></li>
+            <li><a href="#" onClick={(e) => { e.preventDefault(); setCurrentView('analyzer'); }}>SQL Analyzer</a></li>
+            <li><a href="#" onClick={(e) => { e.preventDefault(); setCurrentView('learn'); }}>Learn</a></li>
+            <li><a href="#" onClick={(e) => { e.preventDefault(); setCurrentView('history'); }}>History / Download</a></li>
+            <li><a href="#" onClick={(e) => { e.preventDefault(); setCurrentView('help'); }}>Help</a></li>
+            <li><a href="#" onClick={(e) => { e.preventDefault(); setCurrentView('developed_by'); }}>Developed By</a></li>
+            <li>
+              <button 
+                onClick={toggleTheme} 
+                style={{
+                  background: 'transparent',
+                  border: '1px solid var(--header-text)',
+                  color: 'var(--header-text)',
+                  padding: '0.2rem 0.5rem',
+                  cursor: 'pointer',
+                  borderRadius: '4px',
+                  marginLeft: '0.5rem'
+                }}
+                aria-label="Toggle Light/Dark Mode"
+              >
+                {theme === 'light' ? '☾ Dark' : '☀ Light'}
+              </button>
+            </li>
           </ul>
         </nav>
       </header>
@@ -69,6 +107,24 @@ function App() {
         {currentView === 'history' && (
           <div className="card">
             <HistoryPage />
+          </div>
+        )}
+
+        {currentView === 'learn' && (
+          <div className="card">
+            <LearnPage />
+          </div>
+        )}
+
+        {currentView === 'help' && (
+          <div className="card">
+            <HelpPage />
+          </div>
+        )}
+
+        {currentView === 'developed_by' && (
+          <div className="card">
+            <DevelopedByPage />
           </div>
         )}
       </main>

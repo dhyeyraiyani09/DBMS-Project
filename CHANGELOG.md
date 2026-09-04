@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased] - Phase 4 Complete
 
+## [Phase 8 Complete]
+### Added
+- **Theme Toggle:** Implemented centralized Light/Dark Mode via CSS variables resolving natively using React `localStorage` hooks.
+- **Learn Page:** Integrated concept breakdowns covering Indexing internals, Composite indexing rules, selectivity theory, and embedded educational videos.
+- **Help Page:** Formatted an interactive User Manual for system operations, troubleshooting, and EXPLAIN mapping.
+- **Developed By Page:** Structured academic attributions linking Student details alongside `Dr. Swaminathan A, Assistant Professor`.
+
+
 ## [Phase 7 Complete]
 ### Added
 - **History Storage:** Added `analysis_history` SQL table persisting JSON dumps of heuristic recommendations and MySQL physical execution plans safely.
