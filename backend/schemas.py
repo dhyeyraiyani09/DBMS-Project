@@ -224,3 +224,20 @@ class HistoryResponse(BaseModel):
     analysis_result: Optional[Dict[str, Any]] = None
     recommendation_result: Optional[Dict[str, Any]] = None
     explain_result: Optional[Dict[str, Any]] = None
+
+# --- AI Tutor ---
+class AITutorRequest(BaseModel):
+    action: str = Field(..., description="Action type: explain_recommendation, explain_explain, teach_me, why_not_this_index, quiz_me, learning_insight")
+    question: Optional[str] = Field(None, max_length=500)
+    query_analysis: Optional[Dict[str, Any]] = None
+    recommendation: Optional[Dict[str, Any]] = None
+    explain: Optional[Dict[str, Any]] = None
+    schema_metadata: Optional[Dict[str, Any]] = None
+
+class AITutorResponse(BaseModel):
+    success: bool
+    answer: Optional[str] = None
+    action: str
+    provider: str
+    grounded: bool
+    error: Optional[str] = None

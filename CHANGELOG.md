@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased] - Phase 4 Complete
 
+## [Phase 9 Complete]
+### Added
+- **AI Tutor:** Implemented `AITutor.jsx` overlay inside the Simulation pipeline offering guided educational insights mapping directly over deterministic recommendations.
+- **AI Backend Adapter:** Deployed robust `httpx` wrapper targeting Gemini API resolving dynamically into graceful fallback explanations when `GEMINI_API_KEY` is missing.
+- **Speech Synthesis:** Included native `window.speechSynthesis` Read Aloud functionality providing responsive text-to-speech toggles without external dependencies.
+
+
 ## [Phase 8 Complete]
 ### Added
 - **Theme Toggle:** Implemented centralized Light/Dark Mode via CSS variables resolving natively using React `localStorage` hooks.
