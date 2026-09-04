@@ -10,7 +10,7 @@ function QueryAnalyzer() {
     const [schemas, setSchemas] = useState([]);
     const [selectedSchema, setSelectedSchema] = useState('');
     const [query, setQuery] = useState('');
-    
+
     // State for Simulation
     const [isSimulating, setIsSimulating] = useState(false);
     const [analysis, setAnalysis] = useState(null);
@@ -21,16 +21,16 @@ function QueryAnalyzer() {
 
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-    
+
     const [isSaving, setIsSaving] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(false);
 
     const sampleQueries = [
-        "SELECT * FROM users WHERE age > 25;",
-        "SELECT id, name FROM orders WHERE user_id = 5 ORDER BY order_date DESC;",
-        "SELECT u.name, o.order_date FROM users u JOIN orders o ON u.id = o.user_id WHERE u.id = 5;",
-        "SELECT * FROM orders WHERE user_id = 5 AND order_date >= '2026-01-01' ORDER BY order_date DESC;",
-        "SELECT * FROM users WHERE is_active = TRUE;"
+        { label: "PK Lookup", sql: "SELECT * FROM users WHERE id = 3;" },
+        { label: "Range Query", sql: "SELECT * FROM users WHERE age > 25;" },
+        { label: "Composite + Order", sql: "SELECT id, name FROM orders WHERE user_id = 5 ORDER BY order_date DESC;" },
+        { label: "JOIN Query", sql: "SELECT u.name, o.order_date FROM users u JOIN orders o ON u.id = o.user_id WHERE u.id = 5;" },
+        { label: "Low Selectivity", sql: "SELECT * FROM users WHERE is_active = TRUE;" },
     ];
 
     useEffect(() => {
@@ -46,7 +46,6 @@ function QueryAnalyzer() {
         setExplainData(null);
         setExplainError(null);
         setSaveSuccess(false);
-
         setIsSimulating(false);
         setIsLoading(true);
 
@@ -67,11 +66,11 @@ function QueryAnalyzer() {
                 getRecommendations(query, schemaId),
                 getSchema(schemaId)
             ]);
-            
+
             setAnalysis(analysisData);
             setRecommendations(recData);
             setSchemaData(fullSchema);
-            
+
             try {
                 const expData = await explainQuery(query);
                 setExplainData(expData);
@@ -111,84 +110,202 @@ function QueryAnalyzer() {
 
     return (
         <div className="query-analyzer">
-            <h2>SQL Query Analyzer & Index Simulation</h2>
-            
+            <h2>SQL Query Analyzer &amp; Index Simulation</h2>
+
             {!isSimulating ? (
-                <div className="layout">
-                    <div className="main-content" style={{ flex: 2 }}>
+                <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                    {/* Main form column */}
+                    <div style={{ flex: 2, minWidth: 0 }}>
                         <form onSubmit={handleAnalyze}>
+                            {/* Schema selector */}
                             <div style={{ marginBottom: '1rem' }}>
-                                <label>Required Schema for Recommendations: </label>
-                                <select value={selectedSchema} onChange={e => setSelectedSchema(e.target.value)}>
-                                    <option value="">Select a Schema...</option>
+                                <label htmlFor="schema-select">Schema for Recommendations</label>
+                                <select
+                                    id="schema-select"
+                                    value={selectedSchema}
+                                    onChange={e => setSelectedSchema(e.target.value)}
+                                    style={{ width: '100%' }}
+                                >
+                                    <option value="">Select a schema...</option>
                                     {schemas.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                                 </select>
                             </div>
-                            
-                            <textarea
-                                value={query}
-                                onChange={e => setQuery(e.target.value)}
-                                placeholder="Enter SQL query here..."
-                                rows="6"
-                                style={{ width: '100%', padding: '0.5rem', fontFamily: 'monospace' }}
-                            />
-                            
-                            <div style={{ marginTop: '0.5rem', display: 'flex', gap: '1rem' }}>
-                                <button type="submit" disabled={isLoading}>{isLoading ? 'Analyzing...' : 'Analyze Query'}</button>
-                                <button type="button" onClick={() => {setQuery(''); setAnalysis(null); setRecommendations(null); setError(null); setSaveSuccess(false);}} style={{ background: '#7f8c8d' }}>Clear</button>
+
+                            {/* SQL textarea — styled as code editor */}
+                            <div style={{ marginBottom: '0.75rem' }}>
+                                <label htmlFor="sql-input">SQL Query</label>
+                                <textarea
+                                    id="sql-input"
+                                    value={query}
+                                    onChange={e => setQuery(e.target.value)}
+                                    placeholder="-- Enter SQL query here, e.g.:&#10;SELECT * FROM users WHERE age > 25;"
+                                    rows={7}
+                                    style={{
+                                        width: '100%',
+                                        fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace",
+                                        fontSize: '0.9rem',
+                                        lineHeight: '1.7',
+                                        background: 'var(--code-bg)',
+                                        color: 'var(--code-text)',
+                                        border: '1px solid var(--code-border)',
+                                        borderRadius: 'var(--radius-md)',
+                                        padding: '1rem 1.25rem',
+                                        boxSizing: 'border-box',
+                                        resize: 'vertical',
+                                        outline: 'none',
+                                        boxShadow: 'var(--shadow-sm)',
+                                        transition: 'border-color 0.15s, box-shadow 0.15s',
+                                    }}
+                                    onFocus={e => {
+                                        e.target.style.borderColor = 'var(--accent)';
+                                        e.target.style.boxShadow = '0 0 0 3px rgba(79,70,229,0.15)';
+                                    }}
+                                    onBlur={e => {
+                                        e.target.style.borderColor = 'var(--code-border)';
+                                        e.target.style.boxShadow = 'var(--shadow-sm)';
+                                    }}
+                                />
+                            </div>
+
+                            {/* Action buttons */}
+                            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                <button type="submit" className="btn btn-primary" disabled={isLoading}>
+                                    {isLoading ? '⏳ Analyzing...' : '🔍 Analyze Query'}
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary"
+                                    onClick={() => {
+                                        setQuery('');
+                                        setAnalysis(null);
+                                        setRecommendations(null);
+                                        setError(null);
+                                        setSaveSuccess(false);
+                                    }}
+                                >
+                                    Clear
+                                </button>
                             </div>
                         </form>
 
-                        {error && <div className="error-banner" style={{ marginTop: '1rem', background: '#f8d7da', padding: '1rem', borderRadius: '4px', color: '#721c24' }}>{error}</div>}
+                        {/* Error display */}
+                        {error && (
+                            <div className="error-banner" style={{ marginTop: '1rem' }}>
+                                {error}
+                            </div>
+                        )}
 
+                        {/* Analysis complete — ready for simulation */}
                         {analysis && recommendations && schemaData && (
-                            <div className="ready-banner" style={{ marginTop: '2rem', padding: '2rem', background: '#d1ecf1', borderRadius: '6px', textAlign: 'center' }}>
-                                <h3 style={{ color: '#0c5460', marginTop: 0 }}>Analysis Complete!</h3>
-                                <p style={{ color: '#0c5460' }}>The engine has analyzed your query and generated index recommendations.</p>
-                                <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
-                                    <button 
+                            <div style={{
+                                marginTop: '1.5rem',
+                                padding: '1.5rem',
+                                background: 'var(--accent-light)',
+                                border: '1px solid var(--accent)',
+                                borderLeft: '4px solid var(--accent)',
+                                borderRadius: 'var(--radius-md)',
+                            }}>
+                                <h3 style={{ color: 'var(--accent)', marginTop: 0, marginBottom: '0.5rem' }}>
+                                    ✓ Analysis Complete
+                                </h3>
+                                <p style={{ margin: '0 0 1rem', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+                                    The engine has analyzed your query and generated index recommendations. Start the interactive simulation to walk through all 10 stages.
+                                </p>
+                                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                    <button
                                         onClick={handleStartSimulation}
-                                        style={{ background: '#0c5460', color: 'white', border: 'none', padding: '0.75rem 1.5rem', fontSize: '1.1rem', borderRadius: '4px', cursor: 'pointer' }}
+                                        className="btn btn-primary btn-lg"
                                     >
-                                        Start Interactive Simulation
+                                        ▶ Start Interactive Simulation
                                     </button>
-                                    <button 
+                                    <button
                                         onClick={handleSaveHistory}
                                         disabled={isSaving || saveSuccess}
-                                        style={{ background: saveSuccess ? '#28a745' : '#17a2b8', color: 'white', border: 'none', padding: '0.75rem 1.5rem', fontSize: '1.1rem', borderRadius: '4px', cursor: (isSaving || saveSuccess) ? 'not-allowed' : 'pointer' }}
+                                        className={`btn btn-lg ${saveSuccess ? 'btn-success' : 'btn-secondary'}`}
                                     >
-                                        {isSaving ? 'Saving...' : (saveSuccess ? 'Saved to History' : 'Save Analysis')}
+                                        {isSaving ? '⏳ Saving...' : (saveSuccess ? '✓ Saved to History' : '💾 Save Analysis')}
                                     </button>
                                 </div>
                             </div>
                         )}
                     </div>
 
-                    <div className="sidebar" style={{ flex: 1 }}>
-                        <h3>Sample Queries</h3>
-                        <ul style={{ listStyle: 'none', padding: 0 }}>
-                            {sampleQueries.map((sq, idx) => (
-                                <li key={idx} style={{ marginBottom: '1rem' }}>
-                                    <button 
-                                        onClick={() => setQuery(sq)}
-                                        style={{ textAlign: 'left', width: '100%', background: '#fff', border: '1px solid #ccc', padding: '0.5rem', cursor: 'pointer' }}
-                                    >
-                                        <code>{sq}</code>
-                                    </button>
-                                </li>
-                            ))}
-                        </ul>
+                    {/* Sample queries sidebar */}
+                    <div style={{ flex: 1, minWidth: 220, maxWidth: 320 }}>
+                        <div style={{
+                            background: 'var(--surface-raised, var(--table-header-bg))',
+                            border: '1px solid var(--border)',
+                            borderRadius: 'var(--radius-md)',
+                            overflow: 'hidden',
+                        }}>
+                            <div style={{
+                                padding: '0.65rem 1rem',
+                                borderBottom: '1px solid var(--border)',
+                                fontSize: '0.72rem',
+                                fontWeight: 700,
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.07em',
+                                color: 'var(--text-muted)',
+                            }}>
+                                Sample Queries
+                            </div>
+                            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                                {sampleQueries.map((sq, idx) => (
+                                    <li key={idx} style={{ borderBottom: '1px solid var(--border)' }}>
+                                        <button
+                                            onClick={() => setQuery(sq.sql)}
+                                            style={{
+                                                display: 'block',
+                                                width: '100%',
+                                                textAlign: 'left',
+                                                background: 'transparent',
+                                                border: 'none',
+                                                padding: '0.7rem 1rem',
+                                                cursor: 'pointer',
+                                                transition: 'background 0.15s',
+                                            }}
+                                            onMouseEnter={e => e.currentTarget.style.background = 'var(--sidebar-hover)'}
+                                            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                                        >
+                                            <div style={{
+                                                fontSize: '0.72rem',
+                                                fontWeight: 700,
+                                                color: 'var(--accent)',
+                                                textTransform: 'uppercase',
+                                                letterSpacing: '0.04em',
+                                                marginBottom: '0.2rem',
+                                            }}>
+                                                {sq.label}
+                                            </div>
+                                            <code style={{
+                                                fontSize: '0.76rem',
+                                                display: 'block',
+                                                color: 'var(--text-secondary)',
+                                                background: 'transparent',
+                                                border: 'none',
+                                                padding: 0,
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                fontFamily: "'JetBrains Mono', monospace",
+                                            }}>
+                                                {sq.sql}
+                                            </code>
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
                     </div>
                 </div>
             ) : (
-                <SimulationPipeline 
+                <SimulationPipeline
                     query={query}
                     analysis={analysis}
                     recommendations={recommendations}
                     schemaData={schemaData}
                     explainData={explainData}
                     explainError={explainError}
-
                     onReset={() => setIsSimulating(false)}
                 />
             )}

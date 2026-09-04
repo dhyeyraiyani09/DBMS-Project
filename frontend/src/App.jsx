@@ -8,66 +8,78 @@ import HelpPage from './pages/Help'
 import DevelopedByPage from './pages/DevelopedBy'
 
 function App() {
-  const [healthStatus, setHealthStatus] = useState('checking...');
-  const [dbStatus, setDbStatus] = useState('checking...');
-  const [currentView, setCurrentView] = useState('simulator');
-  const [theme, setTheme] = useState('light');
+  const [healthStatus, setHealthStatus] = useState('checking...')
+  const [dbStatus, setDbStatus] = useState('checking...')
+  const [currentView, setCurrentView] = useState('simulator')
+  const [theme, setTheme] = useState('light')
 
   // Load theme from localStorage on initial render
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
+    const savedTheme = localStorage.getItem('theme')
     if (savedTheme) {
-      setTheme(savedTheme);
-      document.body.setAttribute('data-theme', savedTheme);
+      setTheme(savedTheme)
+      document.body.setAttribute('data-theme', savedTheme)
     }
-  }, []);
+  }, [])
 
   const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-    document.body.setAttribute('data-theme', newTheme);
-  };
+    const newTheme = theme === 'light' ? 'dark' : 'light'
+    setTheme(newTheme)
+    localStorage.setItem('theme', newTheme)
+    document.body.setAttribute('data-theme', newTheme)
+  }
 
   useEffect(() => {
     const verifyHealth = async () => {
-      const result = await checkBackendHealth();
+      const result = await checkBackendHealth()
       if (result.status === 'ok') {
-        setHealthStatus('connected');
-        setDbStatus(result.database || 'unknown');
+        setHealthStatus('connected')
+        setDbStatus(result.database || 'unknown')
       } else {
-        setHealthStatus('error');
-        setDbStatus('error');
+        setHealthStatus('error')
+        setDbStatus('error')
       }
-    };
-    verifyHealth();
-  }, []);
+    }
+    verifyHealth()
+  }, [])
+
+  const navItems = [
+    { id: 'simulator', label: 'Simulator' },
+    { id: 'schema', label: 'Schema' },
+    { id: 'analyzer', label: 'SQL Analyzer' },
+    { id: 'learn', label: 'Learn' },
+    { id: 'history', label: 'History' },
+    { id: 'help', label: 'Help' },
+    { id: 'developed_by', label: 'Developed By' },
+  ]
+
+  const getStatusClass = (s) => {
+    if (s === 'connected') return 'status-connected'
+    if (s === 'error') return 'status-error'
+    return 'status-checking'
+  }
 
   return (
     <>
       <header>
         <h1>Index Recommendation Engine</h1>
         <nav>
-          <ul style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-            <li><a href="#" onClick={(e) => { e.preventDefault(); setCurrentView('simulator'); }}>Simulator</a></li>
-            <li><a href="#" onClick={(e) => { e.preventDefault(); setCurrentView('schema'); }}>Schema Management</a></li>
-            <li><a href="#" onClick={(e) => { e.preventDefault(); setCurrentView('analyzer'); }}>SQL Analyzer</a></li>
-            <li><a href="#" onClick={(e) => { e.preventDefault(); setCurrentView('learn'); }}>Learn</a></li>
-            <li><a href="#" onClick={(e) => { e.preventDefault(); setCurrentView('history'); }}>History / Download</a></li>
-            <li><a href="#" onClick={(e) => { e.preventDefault(); setCurrentView('help'); }}>Help</a></li>
-            <li><a href="#" onClick={(e) => { e.preventDefault(); setCurrentView('developed_by'); }}>Developed By</a></li>
+          <ul>
+            {navItems.map(item => (
+              <li key={item.id}>
+                <a
+                  href="#"
+                  className={currentView === item.id ? 'active-nav' : ''}
+                  onClick={(e) => { e.preventDefault(); setCurrentView(item.id) }}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
             <li>
-              <button 
-                onClick={toggleTheme} 
-                style={{
-                  background: 'transparent',
-                  border: '1px solid var(--header-text)',
-                  color: 'var(--header-text)',
-                  padding: '0.2rem 0.5rem',
-                  cursor: 'pointer',
-                  borderRadius: '4px',
-                  marginLeft: '0.5rem'
-                }}
+              <button
+                onClick={toggleTheme}
+                className="theme-toggle-btn"
                 aria-label="Toggle Light/Dark Mode"
               >
                 {theme === 'light' ? '☾ Dark' : '☀ Light'}
@@ -79,15 +91,68 @@ function App() {
 
       <main className="container">
         {currentView === 'simulator' && (
-          <div className="card">
-            <h2>Welcome to the Simulator</h2>
-            <p>
-              An interactive educational system that analyzes SQL queries and demonstrates how database indexes can improve query execution.
-            </p>
-            <div style={{ marginTop: '2rem' }}>
-              <h3>System Status</h3>
-              <p>Backend API: <span className={`status-badge status-${healthStatus}`}>{healthStatus.toUpperCase()}</span></p>
-              <p>MySQL Database: <span className={`status-badge status-${dbStatus === 'connected' ? 'connected' : 'error'}`}>{dbStatus.toUpperCase()}</span></p>
+          <div className="simulator-home">
+            <div className="card">
+              <div className="simulator-hero">
+                <h2>Index Recommendation Engine</h2>
+                <p>
+                  An interactive educational platform that analyzes SQL queries, applies deterministic
+                  heuristics to recommend database indexes, and visualizes the complete decision pipeline —
+                  step by step.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+                <div className="status-panel">
+                  <div className="status-panel-title">System Status</div>
+                  <div className="status-row">
+                    <strong>Backend API</strong>
+                    <span className={`status-badge ${getStatusClass(healthStatus)}`}>
+                      {healthStatus}
+                    </span>
+                  </div>
+                  <div className="status-row">
+                    <strong>MySQL Database</strong>
+                    <span className={`status-badge ${getStatusClass(dbStatus === 'connected' ? 'connected' : dbStatus)}`}>
+                      {dbStatus}
+                    </span>
+                  </div>
+                </div>
+
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="feature-grid">
+                    <div className="feature-card" onClick={() => setCurrentView('analyzer')} style={{ cursor: 'pointer' }}>
+                      <span className="icon">🔍</span>
+                      <h4>SQL Analyzer</h4>
+                      <p>Parse and analyze SQL queries. Detect clauses, tables, and indexable operations.</p>
+                    </div>
+                    <div className="feature-card" onClick={() => setCurrentView('analyzer')} style={{ cursor: 'pointer' }}>
+                      <span className="icon">⚡</span>
+                      <h4>Recommendation Engine</h4>
+                      <p>Deterministic heuristic scoring: Equality +30, JOIN +25, Range +20, ORDER BY +20.</p>
+                    </div>
+                    <div className="feature-card" onClick={() => setCurrentView('analyzer')} style={{ cursor: 'pointer' }}>
+                      <span className="icon">🌳</span>
+                      <h4>Visual Simulation</h4>
+                      <p>Walk through 10 interactive steps: AST → Candidates → Scoring → EXPLAIN.</p>
+                    </div>
+                    <div className="feature-card" onClick={() => setCurrentView('learn')} style={{ cursor: 'pointer' }}>
+                      <span className="icon">🎓</span>
+                      <h4>AI Tutor</h4>
+                      <p>Educational explanations of recommendations with built-in learning insights.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+                <button
+                  className="btn btn-primary btn-lg"
+                  onClick={() => setCurrentView('analyzer')}
+                >
+                  ▶ Start Simulation
+                </button>
+              </div>
             </div>
           </div>
         )}
