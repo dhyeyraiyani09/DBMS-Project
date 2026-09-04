@@ -47,9 +47,9 @@ def test_ai_tutor_why_not_this_index_fallback():
     tutor_service.api_key = None
     payload = {
         "action": "why_not_this_index",
-        "question": "Why not idx_user_age?",
+        "question": "Why not idx_age?",
         "query_analysis": {"tables": [{"name": "users"}]},
-        "recommendation": {"score": 15, "candidates": []},
+        "recommendation": {"candidates": [{"table": "users", "columns": ["age"], "score": 20, "status": "Not Recommended"}]},
         "explain": None,
         "schema_metadata": None
     }
@@ -69,7 +69,7 @@ def test_ai_tutor_learning_insight_fallback():
         "action": "learning_insight",
         "question": None,
         "query_analysis": {"tables": [{"name": "users"}]},
-        "recommendation": {"score": 15, "candidates": []},
+        "recommendation": {"candidates": [{"table": "users", "columns": ["age"], "score": 20, "status": "Not Recommended"}]},
         "explain": None,
         "schema_metadata": None
     }
@@ -95,3 +95,25 @@ def test_ai_tutor_security_grounding():
     assert res.status_code == 200
     data = res.json()
     assert "GEMINI_API_KEY" not in data.get("action", "")
+
+def test_ai_tutor_why_not_missing_fallback():
+    from backend.routers.ai_router import tutor_service
+    original_key = tutor_service.api_key
+    tutor_service.api_key = None
+    
+    payload = {
+        "action": "why_not_this_index",
+        "question": "Why not idx_age?",
+        "query_analysis": {},
+        "recommendation": {"candidates": [{"table": "users", "columns": ["customer_id"]}]},
+        "explain": None,
+        "schema_metadata": None
+    }
+    from fastapi.testclient import TestClient
+    from backend.main import app
+    client = TestClient(app)
+    res = client.post("/api/ai/tutor", json=payload)
+    assert res.status_code == 200
+    data = res.json()
+    tutor_service.api_key = original_key
+    assert "not present in the available deterministic candidate analysis" in data["answer"]

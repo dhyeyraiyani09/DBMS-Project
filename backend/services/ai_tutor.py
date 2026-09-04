@@ -23,7 +23,7 @@ class AITutorService:
             }
             
         if not self.api_key:
-            return self._get_fallback_response(action)
+            return self._get_fallback_response(action, request_data)
             
         prompt = self._build_prompt(request_data)
         
@@ -110,11 +110,13 @@ Use concise, structured formatting.
         
         return system_rules
 
-    def _get_fallback_response(self, action: str) -> Dict[str, Any]:
+    def _get_fallback_response(self, action: str, request_data: Dict[str, Any]) -> Dict[str, Any]:
         msg = "AI unavailable — showing built-in explanation.\n\n"
         
         if action == "explain_recommendation":
-            msg += "The deterministic engine analyzes your query's WHERE, JOIN, and ORDER BY clauses. It assigns heuristic points (e.g., exact match = 10, range = 5) to possible index columns. It recommends the highest-scoring candidate if it beats a minimum threshold and isn't redundant."
+            msg += """The deterministic engine analyzes your query\'s WHERE, JOIN, and ORDER BY clauses. It assigns heuristic points: Equality / exact WHERE match = +30, Range = +20, JOIN = +25, ORDER BY = +20, GROUP BY = +15. It recommends the highest-scoring candidate if it beats a minimum threshold and isn't redundant.
+
+Note: This is a Project deterministic heuristic, not a MySQL optimizer cost. It does not guarantee runtime performance."""
         elif action == "explain_explain":
             msg += "MySQL EXPLAIN shows the physical execution path. 'type' indicates speed (const > ref > range > ALL). 'possible_keys' shows what MySQL considered, while 'key' shows the final choice. 'rows' is an estimate."
         elif action == "learning_insight":
@@ -124,7 +126,22 @@ Use concise, structured formatting.
         elif action == "quiz_me":
             msg += "Quiz: If an index is defined as (user_id, order_date), which query can fully utilize it?\nA) WHERE order_date = '2023-01-01'\nB) WHERE user_id = 5\n\nCorrect Answer: B. According to the leftmost prefix rule, the first column must be queried to utilize the index."
         elif action == "why_not_this_index":
-            msg += "The requested candidate index was not recommended because the available deterministic analysis either scored it below the minimum threshold, or the analysis does not contain enough information (the column was not heavily utilized in WHERE, JOIN, or ORDER BY conditions). We cannot hallucinate a penalty."
+            candidates = request_data.get("recommendation", {}).get("candidates", []) if request_data.get("recommendation") else []
+            question = (request_data.get("question") or "").lower()
+            
+            found = False
+            for cand in candidates:
+                cols = cand.get("columns", [])
+                if any(col.lower() in question for col in cols):
+                    score = cand.get("score", 0)
+                    status = cand.get("status", "Unknown")
+                    msg += f"The requested candidate index was analyzed. Its score was {score} with status: '{status}'. It was evaluated based on actual query factors (e.g., equality, range, sorting) but was not the primary recommendation due to being outscored or falling below the threshold."
+                    found = True
+                    break
+                    
+            if not found:
+                msg += """The requested index is not present in the available deterministic candidate analysis, so I cannot determine why the engine rejected it.
+No penalty, selectivity value, or performance claim will be invented."""
         else:
             msg += "Fallback explanation: The engine evaluated your query structure to deterministically map B-Tree capabilities. Please configure an AI Provider API key for dynamic educational responses."
             
