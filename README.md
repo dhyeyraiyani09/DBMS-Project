@@ -75,11 +75,11 @@ http://127.0.0.1:8000/api/health
 ```
 
 ## Current Development Phase
-**Phase 4 — Index Recommendation Engine**
+**Phase 5 — Visualization & Interactive Simulation**
 
-The engine dynamically recommends indexes based on a strictly deterministic educational heuristic relying on query predicates and database table structures. **Recommendations are generated using this heuristic alone and are not guaranteed performance predictions nor based on AI guessing.**
+Phase 5 introduces a robust React-driven interactive simulation pipeline, transforming the deterministic index recommendations into an educational step-by-step visualizer. It displays exactly how operations are detected, how candidates are scored, explains left-prefix coverages, and visualizes optimal composite ordering combinations.
+
 
 ### What has NOT been implemented yet:
 - Query optimization logic & EXPLAIN analysis (Phase 6)
-- B-tree visualization (Phase 5)
 - AI Tutor & History system (Phase 7-9)
