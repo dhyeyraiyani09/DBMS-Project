@@ -61,3 +61,10 @@ graph TD
     AllDone -- Yes --> Rank[Rank Candidates by Score]
     Rank --> Output[Return Top Recommendation & Explanation]
 ```
+
+---
+
+## 6. Phase 4 Implementation Notes
+During Phase 4, the deterministic scoring engine was actively implemented. 
+* **Selectivity Heuristics Update**: As true runtime cardinality metrics are not captured by the Phase 2 metadata simulator, the heuristic `High Selectivity (+10)` rule has been disabled to prevent misleading "datatype=high selectivity" claims. The `Low Selectivity (-20)` penalty has been retained as a deterministic heuristic mapping strictly to `BOOLEAN` / `TINYINT(1)` columns.
+* **Redundancy Penalty**: Left-prefix matches correctly trigger the `-30` point redundant penalty.

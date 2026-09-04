@@ -42,7 +42,8 @@ The deterministic implementation relies on exact metric constants:
 * `SCORE_WHERE_RANGE = +20`
 * `SCORE_ORDER_BY = +20`
 * `SCORE_GROUP_BY = +15`
-* `SCORE_HIGH_SELECTIVITY = +10` (Heuristic applying to INT/VARCHAR/UUID)
+* `SCORE_HIGH_SELECTIVITY` = Disabled (Real cardinality statistics are unavailable. Datatypes do not reliably predict selectivity.)
+
 * `PENALTY_EXACT_EXISTING = -100`
 * `PENALTY_REDUNDANT = -30`
 * `PENALTY_LOW_SELECTIVITY = -20` (Heuristic applying to BOOLEAN / TINYINT(1))
@@ -53,19 +54,19 @@ The deterministic implementation relies on exact metric constants:
 ## 7. Example Recommendation
 **Query**: `SELECT * FROM orders WHERE user_id = 5 AND order_date >= '2026-01-01' ORDER BY order_date DESC;`
 **Candidate**: `orders (user_id, order_date)`
-**Score**: `70`
+**Score**: `60`
+
 **Factors**:
 * `+30` Column user_id is used in an equality predicate.
 * `+20` Column order_date is used in ORDER BY.
 * `+20` Column order_date is used in a range predicate.
-* `+10` Column user_id likely has high selectivity.
 * `-10` Composite index with 2 columns has increased maintenance overhead.
 **Final status**: `RECOMMENDED`
 
 ## 8. Five Demonstration Cases
-* **CASE 1 (Simple Range)**: `WHERE age > 25` generates candidate `users (age)` categorized as RANGE and HIGH_SELECTIVITY (+30). Marked `RECOMMENDED`.
-* **CASE 2 (Composite Ordering)**: `WHERE user_id = 5 ORDER BY order_date DESC` generates composite candidate `orders (user_id, order_date)`. The sequence retains exact heuristics (+30 EQ, +20 ORDER, +10 SEL, -10 MAINT). Marked `RECOMMENDED` (Score 50).
-* **CASE 3 (JOINs & Coverage)**: `JOIN orders o ON u.id = o.user_id WHERE u.id = 5` proposes `users(id)` and `orders(user_id)`. `users(id)` is identified as the `EXISTING_PK` and marked `EXISTING`. `orders(user_id)` evaluates to +35 and is `RECOMMENDED`.
+* **CASE 1 (Simple Range)**: `WHERE age > 25` generates candidate `users (age)` categorized as RANGE and (+20). Marked `LOW_PRIORITY`.
+* **CASE 2 (Composite Ordering)**: `WHERE user_id = 5 ORDER BY order_date DESC` generates composite candidate `orders (user_id, order_date)`. The sequence retains exact heuristics (+30 EQ, +20 ORDER, -10 MAINT). Marked `RECOMMENDED` (Score 40).
+* **CASE 3 (JOINs & Coverage)**: `JOIN orders o ON u.id = o.user_id WHERE u.id = 5` proposes `users(id)` and `orders(user_id)`. `users(id)` is identified as the `EXISTING_PK` and marked `EXISTING`. `orders(user_id)` evaluates to +25 and is `LOW_PRIORITY`.
 * **CASE 4 (Redundant Prefix)**: Evaluating `WHERE user_id = 5` against an existing index `(user_id, order_date)`. The candidate `(user_id)` matches the prefix, triggers `REDUNDANT_PREFIX` (-30 points), and receives status `REDUNDANT`.
 * **CASE 5 (Low Selectivity)**: `WHERE is_active = TRUE`. The boolean column is identified, the +30 Equality score is offset by -20 `LOW_SELECTIVITY` bringing the total to `10`. The index falls under the threshold (`30`) and receives status `LOW_PRIORITY`.
 

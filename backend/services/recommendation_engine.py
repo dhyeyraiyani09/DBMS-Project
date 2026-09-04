@@ -113,10 +113,6 @@ class RecommendationEngine:
         
         # Don't add duplicate factors of the same category for the exact same columns if it's not logical
         # Actually, if multiple equality predicates exist on the same column (rare but possible), we shouldn't double count.
-        existing_categories = [f["category"] for f in self.candidates[key]["factors"]]
-        
-        if category in ["WHERE_EQUALITY", "JOIN", "WHERE_RANGE", "ORDER_BY", "GROUP_BY"] and category in existing_categories:
-            return
             
         self.candidates[key]["factors"].append({
             "category": category,
@@ -249,9 +245,9 @@ class RecommendationEngine:
                 data_type = col_def["data_type"].upper()
                 if "BOOL" in data_type or "TINYINT(1)" in data_type:
                     self._add_factor(table, cols, "LOW_SELECTIVITY", PENALTY_LOW_SELECTIVITY, f"Column {col} is boolean/low selectivity.")
-                elif "INT" in data_type or "VARCHAR" in data_type or "UUID" in data_type:
-                    # Generic heuristic: IDs and strings are often high selectivity
-                    self._add_factor(table, cols, "HIGH_SELECTIVITY", SCORE_HIGH_SELECTIVITY, f"Column {col} likely has high selectivity.")
+                # High-selectivity scoring is unavailable because actual cardinality/statistical
+                # information is not currently available in Phase 2 schema metadata.
+
 
     def _evaluate_existing_indexes(self):
         for (table, cols), cand in self.candidates.items():
