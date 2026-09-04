@@ -111,3 +111,10 @@
 ## EXPLAIN Engine
 * **Endpoint:** `POST /api/explain/`
 * **Purpose:** Safely evaluates MySQL `EXPLAIN FORMAT=TRADITIONAL` for AST-validated read-only `SELECT` queries returning mapped optimizer properties distinguishing heuristics from execution realities.
+
+## History & Reports Engine
+* **Endpoints:** 
+  * `POST /api/history/` - Commits a completed analytical pipeline payload (Query, Analysis, Recommendations, EXPLAIN) into persistence.
+  * `GET /api/history/` - Retrieves high-level sequence histories.
+  * `GET /api/history/{id}` - Retrieves exact historical JSON dictionaries.
+  * `GET /api/history/{id}/report?format=pdf|docx|txt` - Compiles professional analytical reports server-side bypassing client bounds natively.

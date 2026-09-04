@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { checkBackendHealth } from './services/api'
 import SchemaManager from './pages/SchemaManager'
 import QueryAnalyzer from './pages/QueryAnalyzer'
+import HistoryPage from './pages/History'
 
 function App() {
   const [healthStatus, setHealthStatus] = useState('checking...');
@@ -32,7 +33,7 @@ function App() {
             <li><a href="#" onClick={() => setCurrentView('schema')}>Schema Management</a></li>
             <li><a href="#" onClick={() => setCurrentView('analyzer')}>SQL Analyzer</a></li>
             <li><a href="#">Learn</a></li>
-            <li><a href="#">History</a></li>
+            <li><a href="#" onClick={() => setCurrentView('history')}>History</a></li>
             <li><a href="#">Help</a></li>
           </ul>
         </nav>
@@ -62,6 +63,12 @@ function App() {
         {currentView === 'schema' && (
           <div className="card">
             <SchemaManager />
+          </div>
+        )}
+
+        {currentView === 'history' && (
+          <div className="card">
+            <HistoryPage />
           </div>
         )}
       </main>

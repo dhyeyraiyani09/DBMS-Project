@@ -62,3 +62,15 @@ CREATE TABLE IF NOT EXISTS index_columns_def (
     UNIQUE (index_id, seq_in_index),
     UNIQUE (index_id, column_id)
 );
+
+CREATE TABLE IF NOT EXISTS analysis_history (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    title VARCHAR(255),
+    schema_id INT,
+    query TEXT NOT NULL,
+    analysis_result JSON,
+    recommendation_result JSON,
+    explain_result JSON,
+    FOREIGN KEY (schema_id) REFERENCES schemas_def(id) ON DELETE SET NULL
+);

@@ -3,6 +3,7 @@ import { getSchemas, getSchema } from '../services/schemaApi';
 import { analyzeQuery } from '../services/queryApi';
 import { getRecommendations } from '../services/recommendationApi';
 import { explainQuery } from '../services/explainApi';
+import { saveHistory } from '../services/historyApi';
 import SimulationPipeline from '../components/Simulation/SimulationPipeline';
 
 function QueryAnalyzer() {
@@ -20,6 +21,9 @@ function QueryAnalyzer() {
 
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    
+    const [isSaving, setIsSaving] = useState(false);
+    const [saveSuccess, setSaveSuccess] = useState(false);
 
     const sampleQueries = [
         "SELECT * FROM users WHERE age > 25;",
@@ -41,6 +45,7 @@ function QueryAnalyzer() {
         setSchemaData(null);
         setExplainData(null);
         setExplainError(null);
+        setSaveSuccess(false);
 
         setIsSimulating(false);
         setIsLoading(true);
@@ -84,6 +89,26 @@ function QueryAnalyzer() {
         setIsSimulating(true);
     };
 
+    const handleSaveHistory = async () => {
+        try {
+            setIsSaving(true);
+            const payload = {
+                title: "Saved SQL Analysis",
+                schema_id: selectedSchema ? parseInt(selectedSchema) : null,
+                query: query,
+                analysis_result: analysis,
+                recommendation_result: recommendations,
+                explain_result: explainData ? explainData : (explainError ? { success: false, error: explainError } : null)
+            };
+            await saveHistory(payload);
+            setSaveSuccess(true);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     return (
         <div className="query-analyzer">
             <h2>SQL Query Analyzer & Index Simulation</h2>
@@ -110,7 +135,7 @@ function QueryAnalyzer() {
                             
                             <div style={{ marginTop: '0.5rem', display: 'flex', gap: '1rem' }}>
                                 <button type="submit" disabled={isLoading}>{isLoading ? 'Analyzing...' : 'Analyze Query'}</button>
-                                <button type="button" onClick={() => {setQuery(''); setAnalysis(null); setRecommendations(null); setError(null);}} style={{ background: '#7f8c8d' }}>Clear</button>
+                                <button type="button" onClick={() => {setQuery(''); setAnalysis(null); setRecommendations(null); setError(null); setSaveSuccess(false);}} style={{ background: '#7f8c8d' }}>Clear</button>
                             </div>
                         </form>
 
@@ -120,12 +145,21 @@ function QueryAnalyzer() {
                             <div className="ready-banner" style={{ marginTop: '2rem', padding: '2rem', background: '#d1ecf1', borderRadius: '6px', textAlign: 'center' }}>
                                 <h3 style={{ color: '#0c5460', marginTop: 0 }}>Analysis Complete!</h3>
                                 <p style={{ color: '#0c5460' }}>The engine has analyzed your query and generated index recommendations.</p>
-                                <button 
-                                    onClick={handleStartSimulation}
-                                    style={{ background: '#0c5460', color: 'white', border: 'none', padding: '0.75rem 1.5rem', fontSize: '1.1rem', borderRadius: '4px', cursor: 'pointer', marginTop: '1rem' }}
-                                >
-                                    Start Interactive Simulation
-                                </button>
+                                <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
+                                    <button 
+                                        onClick={handleStartSimulation}
+                                        style={{ background: '#0c5460', color: 'white', border: 'none', padding: '0.75rem 1.5rem', fontSize: '1.1rem', borderRadius: '4px', cursor: 'pointer' }}
+                                    >
+                                        Start Interactive Simulation
+                                    </button>
+                                    <button 
+                                        onClick={handleSaveHistory}
+                                        disabled={isSaving || saveSuccess}
+                                        style={{ background: saveSuccess ? '#28a745' : '#17a2b8', color: 'white', border: 'none', padding: '0.75rem 1.5rem', fontSize: '1.1rem', borderRadius: '4px', cursor: (isSaving || saveSuccess) ? 'not-allowed' : 'pointer' }}
+                                    >
+                                        {isSaving ? 'Saving...' : (saveSuccess ? 'Saved to History' : 'Save Analysis')}
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </div>

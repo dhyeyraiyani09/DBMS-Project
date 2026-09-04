@@ -197,3 +197,30 @@ class ExplainResponse(BaseModel):
     success: bool
     explain_rows: List[ExplainRow]
     summary: str
+
+# --- History & Reports ---
+class HistoryCreate(BaseModel):
+    title: Optional[str] = "Untitled Analysis"
+    schema_id: Optional[int] = None
+    query: str
+    analysis_result: Optional[Dict[str, Any]] = None
+    recommendation_result: Optional[Dict[str, Any]] = None
+    explain_result: Optional[Dict[str, Any]] = None
+
+class HistorySummary(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    title: Optional[str] = None
+    created_at: datetime
+    query_preview: str
+
+class HistoryResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    created_at: datetime
+    title: Optional[str] = None
+    schema_id: Optional[int] = None
+    query: str
+    analysis_result: Optional[Dict[str, Any]] = None
+    recommendation_result: Optional[Dict[str, Any]] = None
+    explain_result: Optional[Dict[str, Any]] = None

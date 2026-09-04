@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased] - Phase 4 Complete
 
+## [Phase 7 Complete]
+### Added
+- **History Storage:** Added `analysis_history` SQL table persisting JSON dumps of heuristic recommendations and MySQL physical execution plans safely.
+- **Reporting Engine:** Integrated `fpdf2` and `python-docx` backend microservices generating professional TXT, DOCX, and PDF analytics natively.
+- **History UI Integration:** Updated `QueryAnalyzer.jsx` to dynamically push analysis caches into history storage, and created `HistoryPage.jsx` visualizing historical payload strings.
+
+
 ## [Phase 6 Complete]
 ### Added
 - **EXPLAIN API Engine:** Implemented `/api/explain/` securely proxying SELECT-only queries via PyMySQL leveraging AST validation bounds preventing destructive payload execution natively.

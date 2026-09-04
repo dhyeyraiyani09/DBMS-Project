@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, Boolean, ForeignKey, DateTime, UniqueConstraint
+from sqlalchemy import Column, Integer, String, Text, Boolean, ForeignKey, DateTime, UniqueConstraint, JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from .database import Base
@@ -88,3 +88,20 @@ class IndexColumnDef(Base):
 
     index = relationship("IndexDef", back_populates="index_columns")
     column = relationship("ColumnDef")
+
+class AnalysisHistory(Base):
+    __tablename__ = "analysis_history"
+
+    id = Column(Integer, primary_key=True, index=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    title = Column(String(255), nullable=True)
+    schema_id = Column(Integer, ForeignKey("schemas_def.id", ondelete="SET NULL"), nullable=True)
+    query = Column(Text, nullable=False)
+    
+    # Store JSON representation of the complex objects
+    analysis_result = Column(JSON, nullable=True)
+    recommendation_result = Column(JSON, nullable=True)
+    explain_result = Column(JSON, nullable=True)
+    
+    # Relationship just for convenience if we want to load schema details
+    schema = relationship("SchemaDef")
