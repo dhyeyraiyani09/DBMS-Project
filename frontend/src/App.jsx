@@ -13,7 +13,6 @@ function App() {
   const [currentView, setCurrentView] = useState('simulator')
   const [theme, setTheme] = useState('light')
 
-  // Load theme from localStorage on initial render
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme')
     if (savedTheme) {
@@ -44,13 +43,13 @@ function App() {
   }, [])
 
   const navItems = [
-    { id: 'simulator', label: 'Simulator' },
-    { id: 'schema', label: 'Schema' },
-    { id: 'analyzer', label: 'SQL Analyzer' },
-    { id: 'learn', label: 'Learn' },
-    { id: 'history', label: 'History' },
-    { id: 'help', label: 'Help' },
-    { id: 'developed_by', label: 'Developed By' },
+    { id: 'simulator', label: 'Simulator', icon: '⬡' },
+    { id: 'schema', label: 'Schema', icon: '🗄' },
+    { id: 'analyzer', label: 'SQL Analyzer', icon: '🔍' },
+    { id: 'learn', label: 'Learn', icon: '📖' },
+    { id: 'history', label: 'History', icon: '📋' },
+    { id: 'help', label: 'Help', icon: '❓' },
+    { id: 'developed_by', label: 'Developed By', icon: '👤' },
   ]
 
   const getStatusClass = (s) => {
@@ -58,6 +57,47 @@ function App() {
     if (s === 'error') return 'status-error'
     return 'status-checking'
   }
+
+  const pipelineSteps = [
+    { label: 'SQL', accent: true },
+    { label: 'Parse' },
+    { label: 'Detect' },
+    { label: 'Candidates' },
+    { label: 'Score', accent: true },
+    { label: 'Recommend', accent: true },
+    { label: 'EXPLAIN' },
+  ]
+
+  const featureCards = [
+    {
+      icon: '🔍',
+      title: 'SQL Analyzer',
+      desc: 'Parse queries into ASTs. Detect WHERE, JOIN, ORDER BY clauses and indexable operations.',
+      tag: 'Analysis',
+      view: 'analyzer',
+    },
+    {
+      icon: '⚡',
+      title: 'Recommendation Engine',
+      desc: 'Deterministic heuristic scoring: Equality +30, JOIN +25, Range +20, ORDER BY +20.',
+      tag: 'Scoring',
+      view: 'analyzer',
+    },
+    {
+      icon: '🌳',
+      title: 'Visual Simulation',
+      desc: '10 interactive pipeline steps from AST parsing to MySQL EXPLAIN plan analysis.',
+      tag: 'Simulation',
+      view: 'analyzer',
+    },
+    {
+      icon: '🎓',
+      title: 'AI Tutor',
+      desc: 'Built-in educational explanations of every recommendation decision, step by step.',
+      tag: 'Education',
+      view: 'analyzer',
+    },
+  ]
 
   return (
     <>
@@ -92,83 +132,100 @@ function App() {
       <main className="container">
         {currentView === 'simulator' && (
           <div className="simulator-home">
-            <div className="card">
-              <div className="simulator-hero">
-                <h2>Index Recommendation Engine</h2>
-                <p>
-                  An interactive educational platform that analyzes SQL queries, applies deterministic
-                  heuristics to recommend database indexes, and visualizes the complete decision pipeline —
-                  step by step.
+            {/* Hero Section */}
+            <div className="sim-hero-card">
+              <div className="sim-hero-content">
+                <div className="sim-hero-badge">Educational DBMS Tool</div>
+                <h2 className="sim-hero-title">Index Recommendation Engine</h2>
+                <p className="sim-hero-subtitle">
+                  Analyze SQL queries. Discover candidate indexes. Understand exactly
+                  <em> why</em> an index is recommended — step by step.
                 </p>
+                <button
+                  className="btn btn-primary btn-lg sim-cta"
+                  onClick={() => setCurrentView('analyzer')}
+                >
+                  <span>▶ Start Simulation</span>
+                  <span className="cta-arrow">→</span>
+                </button>
               </div>
 
-              <div className="workflow-container">
-                <span className="workflow-node highlight">SQL Query</span>
-                <span className="workflow-arrow">→</span>
-                <span className="workflow-node">Parse AST</span>
-                <span className="workflow-arrow">→</span>
-                <span className="workflow-node">Candidates</span>
-                <span className="workflow-arrow">→</span>
-                <span className="workflow-node highlight">Score</span>
-                <span className="workflow-arrow">→</span>
-                <span className="workflow-node highlight">Recommend</span>
-                <span className="workflow-arrow">→</span>
-                <span className="workflow-node">EXPLAIN</span>
+              {/* Pipeline flow */}
+              <div className="sim-pipeline-flow" aria-label="Processing pipeline">
+                {pipelineSteps.map((step, i) => (
+                  <div key={i} className="pipeline-flow-item">
+                    <div className={`pipeline-flow-node ${step.accent ? 'pipeline-flow-accent' : ''}`}>
+                      {step.label}
+                    </div>
+                    {i < pipelineSteps.length - 1 && (
+                      <div className="pipeline-flow-connector" aria-hidden="true">→</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Status + Feature Cards */}
+            <div className="sim-body-grid">
+              {/* System Status */}
+              <div className="sim-status-card">
+                <div className="sim-status-header">
+                  <span className="sim-status-title">System Status</span>
+                  <div className={`sim-status-indicator ${healthStatus === 'connected' ? 'online' : 'offline'}`} aria-label="System online status"></div>
+                </div>
+
+                <div className="sim-status-row">
+                  <div className="sim-status-row-label">
+                    <span className="sim-status-icon">⬡</span>
+                    <span>Backend API</span>
+                  </div>
+                  <span className={`status-badge ${getStatusClass(healthStatus)}`}>
+                    {healthStatus}
+                  </span>
+                </div>
+
+                <div className="sim-status-row">
+                  <div className="sim-status-row-label">
+                    <span className="sim-status-icon">🗄</span>
+                    <span>MySQL Database</span>
+                  </div>
+                  <span className={`status-badge ${getStatusClass(dbStatus === 'connected' ? 'connected' : dbStatus)}`}>
+                    {dbStatus}
+                  </span>
+                </div>
+
+                <div className="sim-status-footer">
+                  <button
+                    className="btn btn-primary"
+                    style={{ width: '100%' }}
+                    onClick={() => setCurrentView('analyzer')}
+                  >
+                    ▶ Open SQL Analyzer
+                  </button>
+                </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', alignItems: 'stretch' }}>
-                <div className="status-panel">
-                  <div className="status-panel-title">
-                    System Status <div className="pulse"></div>
-                  </div>
-                  <div className="status-row">
-                    <strong>Backend API</strong>
-                    <span className={`status-badge ${getStatusClass(healthStatus)}`}>
-                      {healthStatus}
-                    </span>
-                  </div>
-                  <div className="status-row">
-                    <strong>MySQL Database</strong>
-                    <span className={`status-badge ${getStatusClass(dbStatus === 'connected' ? 'connected' : dbStatus)}`}>
-                      {dbStatus}
-                    </span>
-                  </div>
-                  <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
-                    <button
-                      className="btn btn-primary"
-                      style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                      onClick={() => setCurrentView('analyzer')}
-                    >
-                      <span style={{ fontWeight: 600 }}>▶ Start Simulation</span>
-                      <span>→</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="feature-grid">
-                    <div className="feature-card" onClick={() => setCurrentView('analyzer')} style={{ cursor: 'pointer' }}>
-                      <span className="icon">🔍</span>
-                      <h4>SQL Analyzer</h4>
-                      <p>Parse and analyze SQL queries. Detect clauses, tables, and indexable operations.</p>
+              {/* Feature Cards */}
+              <div className="feature-grid">
+                {featureCards.map((card, i) => (
+                  <div
+                    key={i}
+                    className="feature-card"
+                    onClick={() => setCurrentView(card.view)}
+                    style={{ cursor: 'pointer' }}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && setCurrentView(card.view)}
+                    aria-label={`Open ${card.title}`}
+                  >
+                    <div className="feature-card-top">
+                      <span className="feature-card-icon">{card.icon}</span>
+                      <span className="feature-card-tag">{card.tag}</span>
                     </div>
-                    <div className="feature-card" onClick={() => setCurrentView('analyzer')} style={{ cursor: 'pointer' }}>
-                      <span className="icon">⚡</span>
-                      <h4>Recommendation Engine</h4>
-                      <p>Deterministic heuristic scoring: Equality +30, JOIN +25, Range +20, ORDER BY +20.</p>
-                    </div>
-                    <div className="feature-card" onClick={() => setCurrentView('analyzer')} style={{ cursor: 'pointer' }}>
-                      <span className="icon">🌳</span>
-                      <h4>Visual Simulation</h4>
-                      <p>Walk through 10 interactive steps: AST → Candidates → Scoring → EXPLAIN.</p>
-                    </div>
-                    <div className="feature-card" onClick={() => setCurrentView('learn')} style={{ cursor: 'pointer' }}>
-                      <span className="icon">🎓</span>
-                      <h4>AI Tutor</h4>
-                      <p>Educational explanations of recommendations with built-in learning insights.</p>
-                    </div>
+                    <h4>{card.title}</h4>
+                    <p>{card.desc}</p>
                   </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>
