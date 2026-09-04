@@ -21,3 +21,18 @@ The goal of Phase 7 was to implement History & Reports persistence without impac
 * **No Database Executions:** History limits operations purely to string representations avoiding arbitrary SQL payloads explicitly. 
 * **PDF Bounds:** Safely translates character boundaries targeting `latin-1` maps preventing PDF buffer overflow crashes on unusual user SQL inputs. 
 * No historical limits enforced currently; scaling limits may eventually necessitate pagination buffers.
+
+## 6. Regression Testing
+The automated backend test suite was run to ensure no regressions were introduced across all phases.
+Note: Phase 5 contains 0 automated tests because it is exclusively a React visualization layer. Phase 5 functionality (Simulation pipeline, Autoplay, Explains) was visually verified in the UI and via production build compilation.
+
+| Phase     | Tests Passed |
+| --------- | -----------: |
+| Phase 1   |          1/1 |
+| Phase 2   |          6/6 |
+| Phase 3   |          8/8 |
+| Phase 4   |        11/11 |
+| Phase 5   |          0/0 |
+| Phase 6   |          4/4 |
+| Phase 7   |          4/4 |
+| **TOTAL** |    **34/34** |
