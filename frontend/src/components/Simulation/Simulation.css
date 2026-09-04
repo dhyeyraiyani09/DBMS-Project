@@ -1,6 +1,6 @@
 .simulation-pipeline {
-    background: #fff;
-    border: 1px solid #ddd;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     display: flex;
@@ -10,14 +10,14 @@
 }
 
 .simulation-header {
-    background: #f8f9fa;
+    background: var(--table-header-bg);
     padding: 1rem 1.5rem;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--card-border);
 }
 
 .simulation-header h3 {
     margin: 0 0 1rem 0;
-    color: #2c3e50;
+    color: var(--text-color);
 }
 
 .simulation-progress-bar {
@@ -34,7 +34,7 @@
     left: 1rem;
     right: 1rem;
     height: 2px;
-    background: #e9ecef;
+    background: var(--edu-note-bg);
     z-index: 0;
 }
 
@@ -50,8 +50,8 @@
 .step-dot {
     width: 14px;
     height: 14px;
-    background: #fff;
-    border: 2px solid #ccc;
+    background: var(--card-bg);
+    border: 2px solid var(--card-border);
     border-radius: 50%;
     margin-bottom: 0.5rem;
     transition: all 0.3s;
@@ -63,7 +63,7 @@
 }
 
 .progress-step.active .step-dot {
-    background: #fff;
+    background: var(--card-bg);
     border-color: #e74c3c;
     border-width: 4px;
     box-shadow: 0 0 0 2px rgba(231,76,60,0.2);
@@ -71,7 +71,7 @@
 
 .step-label {
     font-size: 0.7rem;
-    color: #7f8c8d;
+    color: var(--text-color);
     white-space: nowrap;
     text-transform: uppercase;
     font-weight: 600;
@@ -84,13 +84,13 @@
 .simulation-content {
     padding: 2rem 1.5rem;
     min-height: 400px;
-    background: #fafafa;
+    background: var(--bg-color);
 }
 
 .simulation-controls {
-    background: #fff;
+    background: var(--card-bg);
     padding: 1rem 1.5rem;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid var(--card-border);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -127,7 +127,7 @@
 
 .step-container h4 {
     margin-top: 0;
-    color: #2c3e50;
+    color: var(--text-color);
     border-bottom: 2px solid #3498db;
     display: inline-block;
     padding-bottom: 0.25rem;
@@ -135,8 +135,8 @@
 }
 
 .code-panel {
-    background: #2c3e50;
-    color: #ecf0f1;
+    background: var(--code-bg);
+    color: var(--text-color);
     padding: 1.5rem;
     border-radius: 6px;
     font-family: monospace;
@@ -148,9 +148,9 @@
 .step-explanation {
     margin-top: 1.5rem;
     padding: 1rem;
-    background: #e8f4f8;
+    background: var(--edu-note-bg);
     border-left: 4px solid #3498db;
-    color: #34495e;
+    color: var(--text-color);
 }
 
 /* Grids and Cards */
@@ -161,14 +161,14 @@
 }
 
 .op-card, .panel {
-    background: #fff;
-    border: 1px solid #ddd;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     padding: 1rem;
     border-radius: 6px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 
-.op-card h5, .panel h5 { margin-top: 0; color: #7f8c8d; font-size: 0.9rem; text-transform: uppercase; }
+.op-card h5, .panel h5 { margin-top: 0; color: var(--text-color); font-size: 0.9rem; text-transform: uppercase; }
 
 .scoring-list {
     display: flex;
@@ -177,8 +177,8 @@
 }
 
 .score-card {
-    background: #fff;
-    border: 1px solid #ddd;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: 6px;
     padding: 1rem 1.5rem;
 }
@@ -187,7 +187,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--table-row-border);
     padding-bottom: 0.5rem;
     margin-bottom: 1rem;
 }
@@ -210,9 +210,9 @@
 .factor-list .positive .points { color: #27ae60; font-weight: bold; width: 30px; }
 .factor-list .negative .points { color: #e74c3c; font-weight: bold; width: 30px; }
 
-.ranking-table { width: 100%; border-collapse: collapse; background: #fff; }
-.ranking-table th, .ranking-table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #ddd; }
-.ranking-table .row-recommended { background: #eafaf1; }
+.ranking-table { width: 100%; border-collapse: collapse; background: var(--card-bg); }
+.ranking-table th, .ranking-table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--card-border); }
+.ranking-table .row-recommended { background: var(--edu-note-bg); }
 
 .composite-diagram {
     display: flex;
@@ -226,10 +226,10 @@
 .box.eq { background: #27ae60; }
 .box.order { background: #f39c12; }
 .box.range { background: #3498db; }
-.composite-diagram .arrow { font-size: 1.5rem; color: #7f8c8d; }
+.composite-diagram .arrow { font-size: 1.5rem; color: var(--text-color); }
 
-.btree-art { font-family: monospace; text-align: center; color: #2c3e50; font-size: 1.2rem; line-height: 1.2; }
-.caption { font-size: 0.85rem; color: #7f8c8d; text-align: center; font-style: italic; }
+.btree-art { font-family: monospace; text-align: center; color: var(--text-color); font-size: 1.2rem; line-height: 1.2; }
+.caption { font-size: 0.85rem; color: var(--text-color); text-align: center; font-style: italic; }
 
 .status-badge.error { background: #e74c3c; color: white; padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.8rem; }
 
@@ -243,10 +243,10 @@
 
 /* EXPLAIN Step Styles */
 .explain-panel {
-    background: #fff;
-    border: 1px solid #ddd;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: 6px;
     padding: 1.5rem;
 }
-.explain-table th { background: #f8f9fa; color: #2c3e50; }
+.explain-table th { background: var(--table-header-bg); color: var(--text-color); }
 .explain-table td { font-family: monospace; font-size: 0.95rem; }
