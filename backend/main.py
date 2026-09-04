@@ -1,7 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .config import config
-from .database import check_db_connection
+from .database import check_db_connection, Base, engine
+from .routers import schema_router
+
+# Create tables if they don't exist (useful for dev/sqlite but we rely on schema.sql for MySQL)
+if engine and engine.url.drivername == "sqlite":
+    Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Index Recommendation Engine API",
@@ -17,6 +22,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(schema_router.router)
 
 @app.get("/api/health")
 def health_check():

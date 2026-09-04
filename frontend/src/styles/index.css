@@ -26,6 +26,7 @@ nav a {
   color: #ecf0f1;
   text-decoration: none;
   font-weight: 500;
+  cursor: pointer;
 }
 
 nav a:hover {
@@ -53,7 +54,91 @@ nav a:hover {
   font-size: 0.875rem;
   font-weight: bold;
 }
-
 .status-checking { background: #f39c12; color: white; }
 .status-connected { background: #27ae60; color: white; }
 .status-error { background: #e74c3c; color: white; }
+
+/* Schema Manager specific styles */
+.schema-manager .layout {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.schema-manager .sidebar {
+  width: 250px;
+  border-right: 1px solid #ddd;
+  padding-right: 1rem;
+}
+
+.schema-manager .sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.schema-manager .sidebar li {
+  padding: 0.5rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.schema-manager .sidebar li:hover { background: #eee; }
+.schema-manager .sidebar li.active { background: #3498db; color: white; }
+
+.mini-form { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.schema-forms form {
+  border: 1px solid #ddd;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+.schema-forms form h4 { width: 100%; margin: 0 0 0.5rem 0; }
+.schema-forms input, .schema-forms select { padding: 0.4rem; border: 1px solid #ccc; border-radius: 4px; }
+.schema-forms button { padding: 0.4rem 1rem; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; }
+
+.error-banner { background: #e74c3c; color: white; padding: 1rem; border-radius: 4px; margin-bottom: 1rem; }
+
+/* Schema Visualization */
+.tables-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+.db-table {
+  border: 1px solid #2c3e50;
+  border-radius: 6px;
+  width: 300px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.db-table-header {
+  background: #2c3e50;
+  color: white;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+}
+.db-table-header span { font-size: 0.8rem; opacity: 0.8; }
+.db-table-body { padding: 0; background: #fafafa; }
+.db-column {
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+}
+.db-column i { color: #7f8c8d; font-size: 0.8rem; margin-left: 0.5rem; }
+.db-column .pk { color: #f1c40f; margin-right: 0.25rem; font-size: 0.8rem; }
+.db-column .fk { color: #e67e22; margin-right: 0.25rem; font-size: 0.8rem; }
+.db-column .col-id { color: #bdc3c7; font-size: 0.7rem; }
+.db-table-indexes {
+  padding: 0.5rem 1rem;
+  background: #fdfdfd;
+  font-size: 0.85rem;
+}
+.db-index { color: #2980b9; margin-top: 0.25rem; }

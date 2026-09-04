@@ -1,53 +1,60 @@
 # API Design
 
-## Conceptual Endpoints
+## Implemented in Phase 2
 
-### 1. `GET /api/health`
-- **Purpose:** Check backend status.
-- **Request:** None.
-- **Response:** `{"status": "ok", "version": "1.0"}`
-- **Errors:** 500 Internal Server Error if DB is unreachable.
+### 1. `GET /api/schemas/`
+- **Purpose:** Retrieve all created schemas.
+- **Response:** Array of Schema objects.
 
-### 2. `POST /api/schemas`
-- **Purpose:** Create a new mock schema definition.
-- **Request:** JSON object containing schema name, tables, columns, PKs, FKs, and existing indexes.
-- **Response:** `{"schema_id": 123, "status": "created"}`
-- **Validation:** Ensure table and column names are valid strings without SQL injection vectors.
-- **Errors:** 400 Bad Request (Invalid format, duplicate tables).
+### 2. `POST /api/schemas/`
+- **Purpose:** Create a new schema definition.
+- **Request:** `{"name": "ecommerce", "description": "..."}`
+- **Response:** `{"id": 1, "name": "ecommerce", ...}`
+- **Errors:** 400 Bad Request (Duplicate name).
 
 ### 3. `GET /api/schemas/{id}`
-- **Purpose:** Retrieve an existing schema definition.
-- **Request:** URL path parameter `id`.
-- **Response:** Complete JSON structure of the schema, tables, and existing indexes.
+- **Purpose:** Retrieve an existing schema definition (includes tables, columns, indexes).
+- **Response:** Complete JSON structure of the schema.
 - **Errors:** 404 Not Found.
 
-### 4. `POST /api/queries/analyze`
+### 4. `DELETE /api/schemas/{id}`
+- **Purpose:** Delete a schema and cascade delete its contents.
+- **Response:** 204 No Content.
+
+### 5. `POST /api/schemas/{id}/tables`
+- **Purpose:** Add a table to a schema.
+- **Request:** `{"name": "users", "description": ""}`
+
+### 6. `POST /api/schemas/tables/{id}/columns`
+- **Purpose:** Add a column to a table.
+- **Request:** `{"name": "id", "data_type": "INT", "is_primary_key": true, ...}`
+
+### 7. `POST /api/schemas/tables/{id}/foreign-keys`
+- **Purpose:** Define a foreign key relationship.
+- **Request:** `{"column_id": 1, "ref_table_id": 2, "ref_column_id": 3}`
+
+### 8. `POST /api/schemas/tables/{id}/indexes`
+- **Purpose:** Define an index.
+- **Request:** `{"name": "idx_user", "columns": [{"column_id": 1, "seq_in_index": 1}]}`
+
+---
+
+## Planned for later phases
+
+### 9. `POST /api/queries/analyze`
 - **Purpose:** Analyze an SQL query against a schema and generate candidate indexes.
 - **Request:** `{"schema_id": 123, "query": "SELECT ...", "frequency": 10}`
-- **Response:** JSON detailing parsed operations, generated candidates, and existing index flags.
-- **Validation:** SQL query must not be empty. Must parse successfully.
-- **Errors:** 400 Bad Request (Invalid SQL syntax, Unknown table/column).
+- **Response:** JSON detailing parsed operations, generated candidates.
 
-### 5. `POST /api/recommendations`
+### 10. `POST /api/recommendations`
 - **Purpose:** Trigger the scoring engine to rank candidates and produce the final recommendation.
-- **Request:** Candidates payload (often bundled with the `/analyze` endpoint in practice, but conceptually separate).
-- **Response:** List of ranked candidates with scores and text reasoning.
-- **Errors:** 500 Internal Server Error (Scoring engine failure).
+- **Response:** List of ranked candidates with scores and reasoning.
 
-### 6. `POST /api/explain`
+### 11. `POST /api/explain`
 - **Purpose:** Run `EXPLAIN` on the mock DB to retrieve execution plans.
-- **Request:** `{"schema_id": 123, "query": "SELECT ...", "proposed_index": {...}}`
-- **Response:** `{"before": {...explain JSON...}, "after": {...explain JSON...}}`
-- **Errors:** 400 Bad Request (EXPLAIN failure, unsupported syntax).
 
-### 7. `GET /api/history`
+### 12. `GET /api/history`
 - **Purpose:** Retrieve analysis history for the user/session.
-- **Request:** Query params for pagination (limit, offset).
-- **Response:** Array of past analysis runs with timestamps and summaries.
-- **Errors:** 401 Unauthorized (if auth is used).
 
-### 8. `POST /api/reports`
+### 13. `POST /api/reports`
 - **Purpose:** Generate a downloadable report.
-- **Request:** `{"history_id": 456, "format": "pdf"}`
-- **Response:** File stream (PDF/DOCX/TXT).
-- **Errors:** 500 Internal Server Error (Report generation failure).

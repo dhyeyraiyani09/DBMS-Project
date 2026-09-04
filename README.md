@@ -3,23 +3,18 @@
 ## Project Purpose
 An interactive educational system that analyzes SQL queries and demonstrates how database indexes can improve query execution. The system parses SQL, checks for existing indexes, recommends new candidate indexes (single or composite) using a heuristic scoring algorithm, and displays query execution plans.
 
-**Note:** This project is currently in **Phase 1 — Project Foundation & Environment Setup**.
-
 ## Technology Stack
 - **Frontend:** React, Vite, JavaScript, CSS
-- **Backend:** Python, FastAPI, Uvicorn
+- **Backend:** Python, FastAPI, Uvicorn, SQLAlchemy
 - **Database:** MySQL
 
 ## Folder Structure
 ```text
 index-recommendation-engine/
 ├── frontend/          # React + Vite application
-├── backend/           # FastAPI Python application
-├── database/          # Database schemas and scripts
+├── backend/           # FastAPI Python application (Models, Routers, Schemas)
+├── database/          # Database SQL scripts (schema.sql)
 ├── docs/              # Project architecture and planning docs
-├── ai-prompts/        # AI usage logs
-├── screenshots/       # Visuals and screenshots
-├── test-results/      # Automated test outputs
 ```
 
 ## Prerequisites
@@ -33,13 +28,12 @@ index-recommendation-engine/
 Copy the example environment file and configure your MySQL credentials:
 ```bash
 cp .env.example .env
-# Edit .env with your MySQL details
 ```
 
-### 2. Create MySQL Database
-Ensure your MySQL server is running and create the database matching your `.env` file:
-```sql
-CREATE DATABASE index_recommendation_engine;
+### 2. Create MySQL Database & Schema
+Ensure your MySQL server is running and load the Phase 2 schema:
+```bash
+mysql -u root -p < database/schema.sql
 ```
 
 ### 3. Install Backend Dependencies
@@ -70,26 +64,19 @@ Open another terminal and run:
 cd frontend
 npm run dev
 ```
-The frontend will be available at `http://localhost:5173`.
+The frontend will be available at `http://localhost:5173`. Navigate to **Schema Management** to start creating your mock database architectures.
 
 ### Test Health Endpoint
-To verify the backend and database connection, visit:
 ```text
 http://127.0.0.1:8000/api/health
 ```
 
 ## Current Development Phase
-**Phase 1 — Project Foundation & Environment Setup**
+**Phase 2 — Database & Schema Management**
 
 ### What has NOT been implemented yet:
-- SQL parser
-- Index recommendation algorithm
-- Candidate index generation
-- Query optimization logic
-- EXPLAIN analysis
+- SQL parser & clause extraction
+- Index recommendation algorithm & scoring
+- Query optimization logic & EXPLAIN analysis
 - B-tree visualization
-- Recommendation scoring
-- AI Tutor
-- History system
-- Report generation
-- Advanced UI/Visualizations
+- AI Tutor & History system
