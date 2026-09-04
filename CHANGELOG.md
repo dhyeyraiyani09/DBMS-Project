@@ -2,7 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased] - Phase 2 Complete
+## [Unreleased] - Phase 2 Verification & Fixes
+### Fixed
+- Fixed automated testing suite bug where `sqlite:///:memory:` dropped metadata between test steps by introducing `StaticPool` to the test engine in `backend/tests/test_schemas.py`.
+### Added
+- Phase 2 MySQL Verification Audit Report (`docs/phase-2-mysql-verification.md`).
+
+## [Phase 2 Complete]
 ### Added
 - **Database Architecture:** `database/schema.sql` created mapping out schemas, tables, columns, foreign keys, and existing indexes.
 - **Backend ORM:** Replaced raw connection handling with SQLAlchemy models (`backend/models.py`) mapping the database structure.
