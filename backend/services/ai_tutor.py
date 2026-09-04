@@ -12,7 +12,6 @@ class AITutorService:
         action = request_data.get("action")
         question = request_data.get("question")
         
-        # Validation
         valid_actions = ["explain_recommendation", "explain_explain", "teach_me", "why_not_this_index", "quiz_me", "learning_insight"]
         if action not in valid_actions:
             return {
@@ -61,7 +60,7 @@ class AITutorService:
                         "action": action,
                         "provider": "gemini",
                         "grounded": False,
-                        "error": "AI Tutor is currently unavailable. Provider error."
+                        "error": "AI Tutor is currently unavailable. Provider configuration error."
                     }
         except Exception as e:
             return {
@@ -112,7 +111,7 @@ Use concise, structured formatting.
         return system_rules
 
     def _get_fallback_response(self, action: str) -> Dict[str, Any]:
-        msg = "AI unavailable \u2014 showing built-in explanation.\n\n"
+        msg = "AI unavailable — showing built-in explanation.\n\n"
         
         if action == "explain_recommendation":
             msg += "The deterministic engine analyzes your query's WHERE, JOIN, and ORDER BY clauses. It assigns heuristic points (e.g., exact match = 10, range = 5) to possible index columns. It recommends the highest-scoring candidate if it beats a minimum threshold and isn't redundant."
@@ -120,6 +119,12 @@ Use concise, structured formatting.
             msg += "MySQL EXPLAIN shows the physical execution path. 'type' indicates speed (const > ref > range > ALL). 'possible_keys' shows what MySQL considered, while 'key' shows the final choice. 'rows' is an estimate."
         elif action == "learning_insight":
             msg += "Learning Insight: Indexes are ordered left-to-right. Equality predicates usually benefit most from being the leftmost prefix of a composite index."
+        elif action == "teach_me":
+            msg += "In database indexing, column order matters because B-Trees are traversed left-to-right (Leftmost Prefix Rule). If you index (A, B) but only query B, the database cannot use the index effectively because it must evaluate A first."
+        elif action == "quiz_me":
+            msg += "Quiz: If an index is defined as (user_id, order_date), which query can fully utilize it?\nA) WHERE order_date = '2023-01-01'\nB) WHERE user_id = 5\n\nCorrect Answer: B. According to the leftmost prefix rule, the first column must be queried to utilize the index."
+        elif action == "why_not_this_index":
+            msg += "The requested candidate index was not recommended because the available deterministic analysis either scored it below the minimum threshold, or the analysis does not contain enough information (the column was not heavily utilized in WHERE, JOIN, or ORDER BY conditions). We cannot hallucinate a penalty."
         else:
             msg += "Fallback explanation: The engine evaluated your query structure to deterministically map B-Tree capabilities. Please configure an AI Provider API key for dynamic educational responses."
             
