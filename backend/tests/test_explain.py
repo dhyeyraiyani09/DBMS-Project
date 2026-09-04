@@ -11,14 +11,22 @@ def test_explain_analyzer_validation():
     analyzer = ExplainAnalyzer("SELECT * FROM users WHERE age > 25")
     analyzer._validate_safe_select() # Should not raise
     
+    # Valid Nested SELECT
+    analyzer = ExplainAnalyzer("SELECT * FROM users WHERE id IN (SELECT user_id FROM orders)")
+    analyzer._validate_safe_select()
+    
     # Invalid destructive commands
     invalid_queries = [
-        "INSERT INTO users (name) VALUES ('test')",
-        "UPDATE users SET age = 30",
+        "INSERT INTO users VALUES (1, 'x')",
+        "UPDATE users SET name='x'",
         "DELETE FROM users",
         "DROP TABLE users",
-        "ALTER TABLE users ADD COLUMN test int",
-        "CREATE TABLE test (id int)"
+        "ALTER TABLE users ADD COLUMN x INT",
+        "CREATE TABLE test(id INT)",
+        "CREATE INDEX idx_test ON users(age)",
+        "TRUNCATE TABLE users",
+        "RENAME TABLE users TO users2",
+        "GRANT ALL ON *.* TO 'x'"
     ]
     
     for q in invalid_queries:
@@ -26,9 +34,13 @@ def test_explain_analyzer_validation():
             ExplainAnalyzer(q)._validate_safe_select()
         assert "Only SELECT queries are allowed" in str(excinfo.value)
         
-    # Multi-statement
+    # Multi-statement / Injection
     with pytest.raises(ExplainError):
-        ExplainAnalyzer("SELECT * FROM users; SELECT * FROM orders;")._validate_safe_select()
+        ExplainAnalyzer("SELECT * FROM users; DROP TABLE users;")._validate_safe_select()
+        
+    # Comments bypass test
+    with pytest.raises(ExplainError):
+        ExplainAnalyzer("SELECT * FROM users /* comment */; DROP TABLE users;")._validate_safe_select()
 
 def test_explain_api_empty_query():
     response = client.post("/api/explain/", json={"query": ""})
@@ -41,8 +53,10 @@ def test_explain_api_invalid_query():
     assert "Only SELECT queries are allowed" in response.json()["detail"]
 
 def test_explain_api_valid_query():
-    # If the database engine is mock/sqlite, it might not return valid MySQL rows, 
-    # but the endpoint shouldn't crash.
+    # Because we created the 'orders' table in the test DB, this should execute.
     response = client.post("/api/explain/", json={"query": "SELECT * FROM orders WHERE user_id = 5"})
-    # Either 200 (success) or 400 (if table doesn't exist / EXPLAIN fails execution)
-    assert response.status_code in [200, 400]
+    assert response.status_code == 200
+    data = response.json()
+    assert data["success"] is True
+    assert "explain_rows" in data
+    assert isinstance(data["explain_rows"], list)
