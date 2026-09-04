@@ -20,7 +20,7 @@
 ## 4. Deterministic Recommendation (1.5 mins)
 - Show the **Candidate Cards**.
 - Explain the deterministic heuristic natively: +30 for equality on `user_id`, +20 for ordering on `order_date`. Total Score = +50.
-- Point out that it explicitly recommends a composite index leveraging the leftmost prefix rule perfectly.
+- Point out that it explicitly detects the composite index already exists, preventing a redundant recommendation while still visualizing the leftmost prefix rule perfectly.
 
 ## 5. Educational Simulation & AI Tutor (2 mins)
 - Walk through the interactive **Simulation Steps**. Click **Next** to show B-Tree traversal steps safely.
