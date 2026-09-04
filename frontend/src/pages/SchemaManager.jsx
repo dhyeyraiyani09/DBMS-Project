@@ -123,7 +123,7 @@ function SchemaManager() {
                     </ul>
                     <form onSubmit={handleCreateSchema} className="mini-form">
                         <input value={newSchemaName} onChange={e => setNewSchemaName(e.target.value)} placeholder="New Schema Name" required />
-                        <button type="submit">Add Schema</button>
+                        <button type="submit" className="btn btn-primary">Add Schema</button>
                     </form>
                 </div>
 
@@ -136,7 +136,7 @@ function SchemaManager() {
                                 <form onSubmit={handleCreateTable}>
                                     <h4>Add Table</h4>
                                     <input value={newTableName} onChange={e => setNewTableName(e.target.value)} placeholder="Table Name" required />
-                                    <button type="submit">Add Table</button>
+                                    <button type="submit" className="btn btn-primary">Add Table</button>
                                 </form>
 
                                 {selectedSchema.tables.length > 0 && (
@@ -159,7 +159,7 @@ function SchemaManager() {
                                                 <option>BOOLEAN</option>
                                             </select>
                                             <label><input type="checkbox" checked={newCol.is_primary_key} onChange={e => setNewCol({...newCol, is_primary_key: e.target.checked})} /> PK</label>
-                                            <button type="submit">Add Column</button>
+                                            <button type="submit" className="btn btn-primary">Add Column</button>
                                         </form>
 
                                         <form onSubmit={handleCreateFk}>
@@ -174,7 +174,7 @@ function SchemaManager() {
                                                 {selectedSchema.tables.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                                             </select>
                                             <input type="number" placeholder="Target Col ID" value={newFk.ref_column_id} onChange={e => setNewFk({...newFk, ref_column_id: parseInt(e.target.value)})} required />
-                                            <button type="submit">Add FK</button>
+                                            <button type="submit" className="btn btn-primary">Add FK</button>
                                         </form>
 
                                         <form onSubmit={handleCreateIndex}>
@@ -194,7 +194,7 @@ function SchemaManager() {
                                                     ))}
                                                 </select>
                                             </div>
-                                            <button type="submit" disabled={idxCols.length === 0}>Save Index</button>
+                                            <button type="submit" disabled={idxCols.length === 0} className="btn btn-primary">Save Index</button>
                                         </form>
                                     </>
                                 )}

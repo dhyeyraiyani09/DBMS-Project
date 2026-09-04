@@ -2,15 +2,15 @@ import React from 'react';
 
 export default function HelpPage() {
     return (
-        <div className="help-page" style={{ padding: '1rem', lineHeight: '1.6' }}>
+        <div className="help-page">
             <h2>User Manual & Help</h2>
             
-            <section style={{ marginBottom: '2rem' }}>
+            <section>
                 <h3>1. Getting Started</h3>
                 <p>The Index Recommendation Engine is an interactive educational tool that analyzes SQL queries, checks your database schema, and deterministically recommends indexes that could speed up the query execution.</p>
             </section>
 
-            <section style={{ marginBottom: '2rem' }}>
+            <section>
                 <h3>2. Simulator</h3>
                 <ul>
                     <li><strong>Selecting a Schema:</strong> Before running an analysis, you must select an active database schema from the dropdown menu on the Simulator page. (You can create schemas in the <em>Schema Management</em> tab).</li>
@@ -20,7 +20,7 @@ export default function HelpPage() {
                 </ul>
             </section>
 
-            <section style={{ marginBottom: '2rem' }}>
+            <section>
                 <h3>3. Query Analysis</h3>
                 <p>During analysis, the engine extracts key clauses from your query to understand its behavior:</p>
                 <ul>
@@ -31,7 +31,7 @@ export default function HelpPage() {
                 </ul>
             </section>
 
-            <section style={{ marginBottom: '2rem' }}>
+            <section>
                 <h3>4. Recommendation Results</h3>
                 <p>The engine uses a deterministic scoring system:</p>
                 <ul>
@@ -42,7 +42,7 @@ export default function HelpPage() {
                 </ul>
             </section>
 
-            <section style={{ marginBottom: '2rem' }}>
+            <section>
                 <h3>5. Visualization Controls</h3>
                 <p>While running the simulation, you can control playback using the bottom bar:</p>
                 <ul>
@@ -52,7 +52,7 @@ export default function HelpPage() {
                 </ul>
             </section>
 
-            <section style={{ marginBottom: '2rem' }}>
+            <section>
                 <h3>6. MySQL EXPLAIN Interpretation</h3>
                 <p>Step 9 runs your query through the real MySQL Optimizer using <code>EXPLAIN FORMAT=TRADITIONAL</code>. Key fields include:</p>
                 <ul>
@@ -71,12 +71,12 @@ export default function HelpPage() {
                 </ul>
             </section>
 
-            <section style={{ marginBottom: '2rem' }}>
+            <section>
                 <h3>7. History</h3>
                 <p>After analysis, you can click <strong>Save Analysis</strong>. Visit the <strong>History</strong> tab to see a list of your saved sessions. Opening a previous analysis lets you view the exact stored results without re-running the database query.</p>
             </section>
 
-            <section style={{ marginBottom: '2rem' }}>
+            <section>
                 <h3>8. Reports & 9. Download</h3>
                 <p>While viewing a saved analysis in the <strong>History</strong> tab, you can download a generated report. The buttons provided are:</p>
                 <ul>
@@ -86,12 +86,12 @@ export default function HelpPage() {
                 </ul>
             </section>
             
-            <section style={{ marginBottom: '2rem' }}>
+            <section>
                 <h3>10. Light / Dark Mode</h3>
                 <p>Click the <code>☀ / ☾</code> toggle button in the top navigation bar to switch between Light and Dark themes. Your preference is saved automatically in your browser.</p>
             </section>
 
-            <section style={{ marginBottom: '2rem' }}>
+            <section>
                 <h3>11. Troubleshooting</h3>
                 <ul>
                     <li><strong>Invalid SQL Error:</strong> Ensure your query is a valid <code>SELECT</code> statement. The system restricts updates/deletes for security.</li>

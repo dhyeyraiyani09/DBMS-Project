@@ -2,10 +2,10 @@ import React from 'react';
 
 export default function LearnPage() {
     return (
-        <div className="learn-page" style={{ padding: '1rem', lineHeight: '1.6' }}>
+        <div className="learn-page">
             <h2>Learn About Database Indexes</h2>
 
-            <section style={{ marginBottom: '2rem' }}>
+            <section>
                 <h3>What is an Index?</h3>
                 <p>
                     A database index is a data structure (often a B-Tree) that improves the speed of data retrieval operations on a database table at the cost of additional writes and storage space. 
@@ -16,7 +16,7 @@ export default function LearnPage() {
                 </p>
             </section>
 
-            <section style={{ marginBottom: '2rem' }}>
+            <section>
                 <h3>Why Indexes Matter</h3>
                 <ul>
                     <li><strong>WHERE clauses:</strong> Indexes allow the database to quickly jump to rows matching specific conditions (e.g., <code>WHERE age &gt; 25</code>).</li>
@@ -28,7 +28,7 @@ export default function LearnPage() {
                 </div>
             </section>
 
-            <section style={{ marginBottom: '2rem' }}>
+            <section>
                 <h3>Types of Indexes</h3>
                 <ul>
                     <li><strong>Single-column index:</strong> An index created on just one column.</li>
@@ -39,7 +39,7 @@ export default function LearnPage() {
                 </ul>
             </section>
 
-            <section style={{ marginBottom: '2rem' }}>
+            <section>
                 <h3>Understanding Composite Indexes</h3>
                 <p>
                     A composite index spans multiple columns. The <strong>order</strong> of columns is critical due to the <em>leftmost-prefix rule</em>.
@@ -57,7 +57,7 @@ export default function LearnPage() {
                 </p>
             </section>
 
-            <section style={{ marginBottom: '2rem' }}>
+            <section>
                 <h3>Existing Indexes & Selectivity</h3>
                 <p>
                     Before recommending a new index, a smart engine checks for <strong>Existing Indexes</strong> to avoid redundancy. Creating duplicate indexes wastes space and slows down writes.
@@ -69,7 +69,7 @@ export default function LearnPage() {
                 </p>
             </section>
 
-            <section style={{ marginBottom: '2rem' }}>
+            <section>
                 <h3>How the Recommendation Engine Works</h3>
                 <p>This project uses a deterministic and transparent process:</p>
                 <ol>
@@ -87,7 +87,7 @@ export default function LearnPage() {
                 </p>
             </section>
 
-            <section style={{ marginBottom: '2rem' }}>
+            <section>
                 <h3>Educational Video</h3>
                 <p>Watch this video to visually understand how B-Tree indexes traverse data:</p>
                 <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', maxWidth: '100%' }}>

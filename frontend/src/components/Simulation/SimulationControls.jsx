@@ -12,9 +12,14 @@ export default function SimulationControls({
 }) {
     return (
         <div className="simulation-controls">
-            <button onClick={onExit} className="btn-secondary btn-exit">
-                Exit Simulation
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <button onClick={onExit} className="btn-secondary btn-exit">
+                    Exit Simulation
+                </button>
+                <div className="step-info">
+                    Step {currentStep + 1} of {totalSteps}
+                </div>
+            </div>
             <div className="nav-buttons">
                 <button 
                     onClick={onPrev} 

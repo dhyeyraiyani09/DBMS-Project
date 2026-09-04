@@ -328,7 +328,19 @@ export const StepExplainPlan = ({ explainData, explainError }) => {
                                 {explainData.explain_rows.map((row, i) => (
                                     <tr key={i}>
                                         <td><strong>{row.table}</strong></td>
-                                        <td><span className="status-badge" style={{background: '#34495e'}}>{row.type}</span></td>
+                                        <td>
+                                            <span style={{ 
+                                                background: 'var(--accent-light)', 
+                                                color: 'var(--accent)', 
+                                                padding: '0.1rem 0.45rem', 
+                                                borderRadius: '9999px', 
+                                                fontSize: '0.78rem', 
+                                                fontWeight: 700, 
+                                                fontFamily: 'monospace' 
+                                            }}>
+                                                {row.type}
+                                            </span>
+                                        </td>
                                         <td>{row.possible_keys || 'NULL'}</td>
                                         <td><strong>{row.key || 'NULL'}</strong></td>
                                         <td>{row.rows}</td>
@@ -343,9 +355,9 @@ export const StepExplainPlan = ({ explainData, explainError }) => {
                             {explainData.explain_rows.map((row, i) => (
                                 <div key={i} className="op-card">
                                     <strong>{row.table}</strong>
-                                    <p style={{margin: '0.5rem 0', color: '#555'}}>{row.interpretation || 'No specific interpretation available.'}</p>
+                                    <p style={{margin: '0.5rem 0', color: 'var(--text-secondary)'}}>{row.interpretation || 'No specific interpretation available.'}</p>
                                     {row.type === 'ALL' && !row.key && (
-                                        <p style={{fontSize: '0.8rem', color: '#e74c3c'}}>
+                                        <p style={{fontSize: '0.8rem', color: 'var(--danger)'}}>
                                             MySQL is currently not using an index here. Applying the recommended index may provide the optimizer with a faster access path.
                                         </p>
                                     )}
@@ -355,7 +367,7 @@ export const StepExplainPlan = ({ explainData, explainError }) => {
                     </div>
                 )}
             </div>
-            <div className="educational-note" style={{marginTop: '1.5rem', borderLeftColor: '#f39c12', background: '#fdfaee'}}>
+            <div className="educational-note" style={{marginTop: '1.5rem', borderLeftColor: 'var(--warning)', background: 'var(--warning-light)', color: 'var(--text-primary)'}}>
                 <strong>Performance Timing:</strong> Actual execution timing (measured in ms) is not implemented in this simulator phase to prevent unsafe execution of arbitrary queries. EXPLAIN plan analysis allows safe optimizer projection without risking database locks.
             </div>
         </div>
