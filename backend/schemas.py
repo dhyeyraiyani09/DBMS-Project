@@ -148,3 +148,29 @@ class QueryAnalysisResponse(BaseModel):
     having: List[HavingRef] = []
     distinct: bool = False
     limit: Optional[str] = None
+
+# --- Recommendation Engine ---
+class RecommendationRequest(BaseModel):
+    query: str
+    schema_id: int
+
+class RecommendationFactor(BaseModel):
+    category: str
+    points: int
+    reason: str
+
+class IndexCandidateResponse(BaseModel):
+    table: str
+    columns: List[str]
+    index_type: str = "BTREE"
+    score: int
+    status: str
+    factors: List[RecommendationFactor] = []
+    existing_index_conflict: bool = False
+
+class RecommendationResponse(BaseModel):
+    query: str
+    schema_id: int
+    analysis_summary: QueryAnalysisResponse
+    candidates: List[IndexCandidateResponse]
+    recommendations: List[IndexCandidateResponse]

@@ -1,20 +1,22 @@
 import { useState, useEffect } from 'react';
 import { getSchemas } from '../services/schemaApi';
 import { analyzeQuery } from '../services/queryApi';
+import { getRecommendations } from '../services/recommendationApi';
 
 function QueryAnalyzer() {
     const [schemas, setSchemas] = useState([]);
     const [selectedSchema, setSelectedSchema] = useState('');
     const [query, setQuery] = useState('');
     const [analysis, setAnalysis] = useState(null);
+    const [recommendations, setRecommendations] = useState(null);
     const [error, setError] = useState(null);
 
     const sampleQueries = [
         "SELECT * FROM users WHERE age > 25;",
         "SELECT id, name FROM orders WHERE user_id = 5 ORDER BY order_date DESC;",
         "SELECT u.name, o.order_date FROM users u JOIN orders o ON u.id = o.user_id WHERE u.id = 5;",
-        "SELECT user_id, COUNT(*) FROM orders GROUP BY user_id HAVING COUNT(*) > 5;",
-        "SELECT * FROM orders WHERE user_id = 5 AND order_date >= '2026-01-01' ORDER BY user_id ASC, order_date DESC;"
+        "SELECT * FROM orders WHERE user_id = 5 AND order_date >= '2026-01-01' ORDER BY order_date DESC;",
+        "SELECT * FROM users WHERE is_active = TRUE;"
     ];
 
     useEffect(() => {
@@ -25,14 +27,25 @@ function QueryAnalyzer() {
         e.preventDefault();
         setError(null);
         setAnalysis(null);
+        setRecommendations(null);
         if (!query.trim()) {
             setError("Please enter a SQL query.");
             return;
         }
 
         try {
-            const data = await analyzeQuery(query, selectedSchema ? parseInt(selectedSchema) : null);
+            const schemaId = selectedSchema ? parseInt(selectedSchema) : null;
+            const data = await analyzeQuery(query, schemaId);
             setAnalysis(data);
+            
+            if (schemaId) {
+                try {
+                    const recData = await getRecommendations(query, schemaId);
+                    setRecommendations(recData);
+                } catch (recErr) {
+                    setError("Analyzer worked, but Recommendation Engine failed: " + recErr.message);
+                }
+            }
         } catch (err) {
             setError(err.message);
         }
@@ -40,15 +53,15 @@ function QueryAnalyzer() {
 
     return (
         <div className="query-analyzer">
-            <h2>SQL Query Analyzer</h2>
+            <h2>SQL Query Analyzer & Index Recommender</h2>
             
             <div className="layout">
                 <div className="main-content" style={{ flex: 2 }}>
                     <form onSubmit={handleAnalyze}>
                         <div style={{ marginBottom: '1rem' }}>
-                            <label>Optional Schema Validation: </label>
+                            <label>Required Schema for Recommendations: </label>
                             <select value={selectedSchema} onChange={e => setSelectedSchema(e.target.value)}>
-                                <option value="">None (Skip Validation)</option>
+                                <option value="">Select a Schema...</option>
                                 {schemas.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                             </select>
                         </div>
@@ -62,12 +75,50 @@ function QueryAnalyzer() {
                         />
                         
                         <div style={{ marginTop: '0.5rem', display: 'flex', gap: '1rem' }}>
-                            <button type="submit">Analyze Query</button>
-                            <button type="button" onClick={() => {setQuery(''); setAnalysis(null); setError(null);}} style={{ background: '#7f8c8d' }}>Clear</button>
+                            <button type="submit">Analyze & Recommend</button>
+                            <button type="button" onClick={() => {setQuery(''); setAnalysis(null); setRecommendations(null); setError(null);}} style={{ background: '#7f8c8d' }}>Clear</button>
                         </div>
                     </form>
 
                     {error && <div className="error-banner" style={{ marginTop: '1rem' }}>{error}</div>}
+
+                    {recommendations && (
+                        <div className="recommendations" style={{ marginTop: '2rem' }}>
+                            <h3>INDEX RECOMMENDATIONS</h3>
+                            <p><em>Recommendations are generated using a deterministic educational heuristic. They are not guaranteed performance predictions.</em></p>
+                            
+                            <h4>Recommended Indexes</h4>
+                            {recommendations.recommendations.length === 0 ? <p>No new indexes recommended.</p> : (
+                                recommendations.recommendations.map((r, i) => (
+                                    <div key={i} style={{ background: '#d4edda', border: '1px solid #c3e6cb', padding: '1rem', borderRadius: '4px', marginBottom: '1rem' }}>
+                                        <h5 style={{ margin: '0 0 0.5rem 0', color: '#155724' }}>{r.table} ({r.columns.join(', ')})</h5>
+                                        <p style={{ margin: '0 0 0.5rem 0' }}><strong>Score:</strong> {r.score} / 100</p>
+                                        <p style={{ margin: '0 0 0.5rem 0' }}><strong>Why?</strong></p>
+                                        <ul style={{ margin: 0, paddingLeft: '1.5rem' }}>
+                                            {r.factors.map((f, j) => (
+                                                <li key={j}>{f.points > 0 ? '+' : ''}{f.points} {f.reason}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                ))
+                            )}
+
+                            <h4>Other Candidates & Existing Indexes</h4>
+                            {recommendations.candidates.filter(c => c.status !== 'RECOMMENDED').length === 0 ? <p>None</p> : (
+                                recommendations.candidates.filter(c => c.status !== 'RECOMMENDED').map((c, i) => (
+                                    <div key={i} style={{ background: '#f8d7da', border: '1px solid #f5c6cb', padding: '1rem', borderRadius: '4px', marginBottom: '1rem' }}>
+                                        <h5 style={{ margin: '0 0 0.5rem 0', color: '#721c24' }}>{c.table} ({c.columns.join(', ')})</h5>
+                                        <p style={{ margin: '0 0 0.5rem 0' }}><strong>Status:</strong> {c.status}</p>
+                                        <ul style={{ margin: 0, paddingLeft: '1.5rem' }}>
+                                            {c.factors.map((f, j) => (
+                                                <li key={j}>{f.points > 0 ? '+' : ''}{f.points} {f.reason}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    )}
 
                     {analysis && (
                         <div className="analysis-result" style={{ marginTop: '2rem' }}>
@@ -82,13 +133,6 @@ function QueryAnalyzer() {
                                     </ul>
                                 )}
 
-                                <h4>Columns</h4>
-                                {analysis.columns.length === 0 ? <p>None</p> : (
-                                    <ul>
-                                        {analysis.columns.map((c, i) => <li key={i}>{c.table ? `${c.table}.` : ''}{c.name}</li>)}
-                                    </ul>
-                                )}
-
                                 <h4>WHERE Conditions</h4>
                                 {analysis.where_conditions.length === 0 ? <p>None</p> : (
                                     <ul>
@@ -96,47 +140,6 @@ function QueryAnalyzer() {
                                             <li key={i}>
                                                 <code>{w.expression_raw}</code> (<strong>{w.classification}</strong>)
                                             </li>
-                                        ))}
-                                    </ul>
-                                )}
-
-                                <h4>JOINs</h4>
-                                {analysis.joins.length === 0 ? <p>None</p> : (
-                                    <ul>
-                                        {analysis.joins.map((j, i) => (
-                                            <li key={i}>
-                                                {j.join_type} {j.table} {j.alias ? `(${j.alias})` : ''} 
-                                                {j.conditions.length > 0 && ` ON ${j.conditions[0].left} ${j.conditions[0].operator} ${j.conditions[0].right}`}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-
-                                <h4>ORDER BY</h4>
-                                {analysis.order_by.length === 0 ? <p>None</p> : (
-                                    <ul>
-                                        {analysis.order_by.map((o, i) => (
-                                            <li key={i}>
-                                                {o.sequence}. {o.table ? `${o.table}.` : ''}{o.column} <strong>{o.direction}</strong>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-
-                                <h4>GROUP BY</h4>
-                                {analysis.group_by.length === 0 ? <p>None</p> : (
-                                    <ul>
-                                        {analysis.group_by.map((g, i) => (
-                                            <li key={i}>{g.sequence}. {g.table ? `${g.table}.` : ''}{g.column}</li>
-                                        ))}
-                                    </ul>
-                                )}
-                                
-                                <h4>HAVING</h4>
-                                {analysis.having.length === 0 ? <p>None</p> : (
-                                    <ul>
-                                        {analysis.having.map((h, i) => (
-                                            <li key={i}><code>{h.expression_raw}</code></li>
                                         ))}
                                     </ul>
                                 )}

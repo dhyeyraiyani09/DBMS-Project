@@ -79,3 +79,31 @@
 
 ### 13. `POST /api/reports`
 - **Purpose:** Generate a downloadable report.
+
+### 10. `POST /api/recommendations/` (Implemented in Phase 4)
+- **Purpose:** Analyze a query against a schema to generate index recommendations.
+- **Request:** `{"query": "SELECT * FROM users WHERE age > 25;", "schema_id": 1}`
+- **Response:** JSON representation of the query structural analysis and candidate generation:
+```json
+{
+  "query": "SELECT * FROM users WHERE age > 25;",
+  "schema_id": 1,
+  "analysis_summary": { ... },
+  "candidates": [
+    {
+      "table": "users",
+      "columns": ["age"],
+      "index_type": "BTREE",
+      "score": 40,
+      "status": "RECOMMENDED",
+      "factors": [
+        {"category": "WHERE_RANGE", "points": 20, "reason": "Column age is used in a range predicate."},
+        {"category": "HIGH_SELECTIVITY", "points": 10, "reason": "Column age likely has high selectivity."}
+      ],
+      "existing_index_conflict": false
+    }
+  ],
+  "recommendations": [ ... ]
+}
+```
+- **Errors:** 400 Bad Request (Invalid SQL), 404 Not Found (Missing Schema), 500 Internal Error.

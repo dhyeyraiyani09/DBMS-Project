@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .config import config
 from .database import check_db_connection, Base, engine
-from .routers import schema_router, query_router
+from .routers import schema_router, query_router, recommendation_router
 
 # Create tables if they don't exist (useful for dev/sqlite but we rely on schema.sql for MySQL)
 if engine and engine.url.drivername == "sqlite":
@@ -25,6 +25,8 @@ app.add_middleware(
 
 app.include_router(schema_router.router)
 app.include_router(query_router.router)
+app.include_router(recommendation_router.router)
+
 
 
 @app.get("/api/health")

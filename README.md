@@ -67,7 +67,7 @@ npm run dev
 ```
 The frontend will be available at `http://localhost:5173`. 
 - Navigate to **Schema Management** to create your mock database architectures.
-- Navigate to **SQL Analyzer** to enter a query and analyze its structured AST components.
+- Navigate to **SQL Analyzer** to enter a query, parse its AST, and request heuristic-based Index Recommendations.
 
 ### Test Health Endpoint
 ```text
@@ -75,12 +75,11 @@ http://127.0.0.1:8000/api/health
 ```
 
 ## Current Development Phase
-**Phase 3 — SQL Query Analyzer**
+**Phase 4 — Index Recommendation Engine**
 
-*Note: The current SQL Query Analyzer identifies query structure and parses semantics. It does NOT yet score or recommend new indexes.*
+The engine dynamically recommends indexes based on a strictly deterministic educational heuristic relying on query predicates and database table structures. **Recommendations are generated using this heuristic alone and are not guaranteed performance predictions nor based on AI guessing.**
 
 ### What has NOT been implemented yet:
-- Index candidate generation & recommendation scoring (Phase 4)
-- Query optimization logic & EXPLAIN analysis
-- B-tree visualization
-- AI Tutor & History system
+- Query optimization logic & EXPLAIN analysis (Phase 6)
+- B-tree visualization (Phase 5)
+- AI Tutor & History system (Phase 7-9)
