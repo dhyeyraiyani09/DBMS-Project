@@ -6,7 +6,7 @@ from typing import Dict, Any
 class AITutorService:
     def __init__(self):
         self.api_key = os.getenv("GEMINI_API_KEY")
-        self.endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+        self.endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent"
         
     async def process_request(self, request_data: Dict[str, Any]) -> Dict[str, Any]:
         action = request_data.get("action")
@@ -54,23 +54,11 @@ class AITutorService:
                         "error": None
                     }
                 else:
-                    return {
-                        "success": False,
-                        "answer": None,
-                        "action": action,
-                        "provider": "gemini",
-                        "grounded": False,
-                        "error": "AI Tutor is currently unavailable. Provider configuration error."
-                    }
+                    print(f"Gemini API Error: {response.status_code} - {response.text}")
+                    return self._get_fallback_response(action, request_data)
         except Exception as e:
-            return {
-                "success": False,
-                "answer": None,
-                "action": action,
-                "provider": "gemini",
-                "grounded": False,
-                "error": f"AI Tutor is currently unavailable. Network failure: {str(e)}"
-            }
+            print(f"Gemini Network Error: {str(e)}")
+            return self._get_fallback_response(action, request_data)
             
     def _build_prompt(self, request: Dict[str, Any]) -> str:
         action = request.get("action")
