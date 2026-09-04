@@ -102,9 +102,25 @@ function App() {
                 </p>
               </div>
 
-              <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+              <div className="workflow-container">
+                <span className="workflow-node highlight">SQL Query</span>
+                <span className="workflow-arrow">→</span>
+                <span className="workflow-node">Parse AST</span>
+                <span className="workflow-arrow">→</span>
+                <span className="workflow-node">Candidates</span>
+                <span className="workflow-arrow">→</span>
+                <span className="workflow-node highlight">Score</span>
+                <span className="workflow-arrow">→</span>
+                <span className="workflow-node highlight">Recommend</span>
+                <span className="workflow-arrow">→</span>
+                <span className="workflow-node">EXPLAIN</span>
+              </div>
+
+              <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', alignItems: 'stretch' }}>
                 <div className="status-panel">
-                  <div className="status-panel-title">System Status</div>
+                  <div className="status-panel-title">
+                    System Status <div className="pulse"></div>
+                  </div>
                   <div className="status-row">
                     <strong>Backend API</strong>
                     <span className={`status-badge ${getStatusClass(healthStatus)}`}>
@@ -116,6 +132,16 @@ function App() {
                     <span className={`status-badge ${getStatusClass(dbStatus === 'connected' ? 'connected' : dbStatus)}`}>
                       {dbStatus}
                     </span>
+                  </div>
+                  <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
+                    <button
+                      className="btn btn-primary"
+                      style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                      onClick={() => setCurrentView('analyzer')}
+                    >
+                      <span style={{ fontWeight: 600 }}>▶ Start Simulation</span>
+                      <span>→</span>
+                    </button>
                   </div>
                 </div>
 
@@ -143,15 +169,6 @@ function App() {
                     </div>
                   </div>
                 </div>
-              </div>
-
-              <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-                <button
-                  className="btn btn-primary btn-lg"
-                  onClick={() => setCurrentView('analyzer')}
-                >
-                  ▶ Start Simulation
-                </button>
               </div>
             </div>
           </div>

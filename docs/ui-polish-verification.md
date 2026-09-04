@@ -158,3 +158,44 @@ STATUS: RUNTIME-VERIFIED
 **PASS — UI POLISH FULLY FINALIZED**
 
 The visual redesign is strictly focused on presentation. The token-based CSS system allows robust light/dark theming without relying on inline color declarations. The UI looks polished, professional, and educational while remaining true to all functional requirements.
+
+## Landing Page Polish (Simulator Home)
+
+**Commit**: (Pending final commit)
+
+### Visual Improvements Made
+- **Reduced Hero Vertical Space**: Reduced `padding-top/bottom` and `margin-bottom` on `.simulator-hero` to bring the main content higher up on the screen and reduce unnecessary empty space.
+- **Workflow Visualization**: Added a `.workflow-container` section that visually maps out the engine's pipeline (`SQL Query → Parse AST → Candidates → Score → Recommend → EXPLAIN`) right below the hero. This serves as an immediate educational anchor.
+- **Feature Cards Enhancement**: Added smooth `transform: translateY(-2px)` lift effect and stronger `box-shadow` on hover to `.feature-card`. Also added an animated top border using `::before` pseudo-element for a polished, interactive feel.
+- **System Status Panel**: Added a pulsing green dot animation (`.pulse`) to the panel title to indicate live status monitoring. Re-aligned the panel to stretch alongside the feature grid.
+- **Call to Action Integration**: Moved the "Start Simulation" button from a standalone centered block into the bottom of the System Status panel to create a stronger, more actionable visual flow on the left column.
+
+### Functionality Preserved
+- No backend logic or APIs were modified.
+- Phase 4 recommendation logic is completely untouched.
+- `App.jsx` React state and routing logic (e.g. `setCurrentView`) remains exactly the same.
+- No new dependencies were added to `package.json`.
+
+### Build & Regression Results
+**Frontend Build**:
+```
+✓ 51 modules transformed.
+dist/index.html                   0.41 kB │ gzip:  0.27 kB
+dist/assets/index-ea81a687.css   33.17 kB │ gzip:  6.61 kB
+dist/assets/index-5d9ba90a.js   208.55 kB │ gzip: 61.93 kB
+✓ built in 503ms
+```
+STATUS: BUILD-VERIFIED
+
+**Backend Tests**:
+```
+41 passed, 2 warnings in 1.43s
+```
+STATUS: RUNTIME-VERIFIED
+
+**Browser E2E**:
+NOT TESTED — browser automation unavailable.
+
+### Final Verdict (Updated)
+**PASS — SIMULATOR LANDING PAGE POLISHED**
+The Simulator landing page now fully embraces the "Modern SaaS + Developer Tool" aesthetic. The visual hierarchy is much stronger, empty space is managed better, and the educational workflow adds immediate context without any functional overhead.
