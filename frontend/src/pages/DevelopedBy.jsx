@@ -2,54 +2,96 @@ import React from 'react';
 
 export default function DevelopedByPage() {
     return (
-        <div className="developed-by-page" style={{ padding: '2rem 1rem', textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
-            <h2 style={{ marginBottom: '2.5rem', fontSize: '1.8rem', letterSpacing: '-0.02em' }}>Project: Index Recommendation Engine</h2>
+        <div className="developed-by-page">
+            {/* Project Header */}
+            <div className="dev-project-header">
+                <div className="dev-project-icon">⬡</div>
+                <div>
+                    <div className="dev-project-label">Academic Project</div>
+                    <h2 className="dev-project-title">Index Recommendation Engine</h2>
+                    <p className="dev-project-subtitle">
+                        An interactive educational platform for database index analysis, deterministic scoring,
+                        and SQL query optimization visualization.
+                    </p>
+                </div>
+            </div>
 
-            <div className="team-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2.5rem' }}>
-                
-                <section className="card student-section" style={{ width: '100%', maxWidth: '500px', padding: '2.5rem 2rem' }}>
-                    <h3 style={{ margin: '0 0 1.5rem', color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.85rem' }}>Developed By</h3>
-                    
-                    <div className="photo-placeholder" style={{ 
-                        width: '140px', 
-                        height: '140px', 
-                        background: 'var(--surface-raised, var(--table-header-bg))', 
-                        borderRadius: '50%', 
-                        margin: '0 auto 2rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        border: '2px dashed var(--border-strong, var(--border))',
-                        color: 'var(--text-muted)',
-                        fontSize: '0.875rem'
-                    }}>
-                        <span>[Student Photo]</span>
-                    </div>
+            {/* Tech Stack Badges */}
+            <div className="dev-tech-row">
+                {['Python', 'FastAPI', 'MySQL', 'React', 'SQLGlot', 'Gemini AI'].map(tech => (
+                    <span key={tech} className="dev-tech-badge">{tech}</span>
+                ))}
+            </div>
 
-                    <div style={{ textAlign: 'left', display: 'inline-block', width: '100%' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: '0.75rem', marginBottom: '0.75rem' }}>
-                            <strong style={{ color: 'var(--text-secondary)' }}>Student Name</strong> 
-                            <span style={{ fontWeight: 600 }}>[Enter Student Name]</span>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: '0.75rem', marginBottom: '0.75rem' }}>
-                            <strong style={{ color: 'var(--text-secondary)' }}>Register Number</strong> 
-                            <span style={{ fontWeight: 600, fontFamily: 'monospace' }}>[Enter Register Number]</span>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem' }}>
-                            <strong style={{ color: 'var(--text-secondary)' }}>Team Members</strong> 
-                            <span style={{ fontWeight: 600 }}>[Enter Team Member Names]</span>
+            {/* Main Cards Row */}
+            <div className="dev-cards-grid">
+                {/* Developer Card */}
+                <section className="dev-card dev-student-card">
+                    <div className="dev-card-label">Developed By</div>
+                    <div className="dev-photo-ring">
+                        <div className="dev-photo-placeholder">
+                            <span className="dev-photo-icon">👤</span>
+                            <span className="dev-photo-text">[Student Photo]</span>
                         </div>
                     </div>
-                </section>
-
-                <section className="card guide-section" style={{ width: '100%', maxWidth: '500px', padding: '2rem' }}>
-                    <h3 style={{ margin: '0 0 1rem', color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.85rem' }}>Guided By</h3>
-                    <div>
-                        <p style={{ fontSize: '1.25rem', fontWeight: 700, margin: '0 0 0.25rem', color: 'var(--text-primary)' }}>Dr. Swaminathan A</p>
-                        <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: '0.9rem' }}>Assistant Professor</p>
+                    <div className="dev-info-rows">
+                        <div className="dev-info-row">
+                            <span className="dev-info-label">Name</span>
+                            <span className="dev-info-value">[Enter Student Name]</span>
+                        </div>
+                        <div className="dev-info-row">
+                            <span className="dev-info-label">Reg. No</span>
+                            <span className="dev-info-value dev-info-mono">[Enter Register Number]</span>
+                        </div>
                     </div>
                 </section>
 
+                {/* Team + Guided By Column */}
+                <div className="dev-right-col">
+                    {/* Team Members */}
+                    <section className="dev-card">
+                        <div className="dev-card-label">Team Members</div>
+                        <div className="dev-team-placeholder">
+                            <span className="dev-team-icon">👥</span>
+                            <p>[Enter Team Member Names]</p>
+                        </div>
+                    </section>
+
+                    {/* Guided By */}
+                    <section className="dev-card dev-guide-card">
+                        <div className="dev-card-label">Guided By</div>
+                        <div className="dev-guide-inner">
+                            <div className="dev-guide-avatar">
+                                <span>🎓</span>
+                            </div>
+                            <div>
+                                <div className="dev-guide-name">Dr. Swaminathan A</div>
+                                <div className="dev-guide-role">Assistant Professor</div>
+                                <div className="dev-guide-dept">Department of Computer Science</div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            {/* Features row */}
+            <div className="dev-features-row">
+                {[
+                    { icon: '🔍', label: 'SQL Parser', desc: 'SQLGlot AST engine' },
+                    { icon: '⚡', label: 'Scoring Engine', desc: 'Deterministic heuristics' },
+                    { icon: '🌳', label: 'B-Tree Viz', desc: 'Conceptual diagrams' },
+                    { icon: '🎓', label: 'AI Tutor', desc: 'Gemini-powered' },
+                    { icon: '📋', label: 'Reports', desc: 'PDF · DOCX · TXT' },
+                    { icon: '🗄', label: 'MySQL', desc: 'Real EXPLAIN plans' },
+                ].map(f => (
+                    <div key={f.label} className="dev-feature-pill">
+                        <span className="dev-feature-icon">{f.icon}</span>
+                        <div>
+                            <div className="dev-feature-label">{f.label}</div>
+                            <div className="dev-feature-desc">{f.desc}</div>
+                        </div>
+                    </div>
+                ))}
             </div>
         </div>
     );

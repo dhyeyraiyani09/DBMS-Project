@@ -1,106 +1,198 @@
 import React from 'react';
 
+const SectionIcon = ({ icon }) => (
+    <span className="help-section-icon">{icon}</span>
+);
+
+const Step = ({ n, label, desc }) => (
+    <div className="help-step">
+        <div className="help-step-num">{n}</div>
+        <div className="help-step-body">
+            <strong>{label}</strong>
+            {desc && <span> — {desc}</span>}
+        </div>
+    </div>
+);
+
+const AccessBadge = ({ type, color }) => (
+    <span className="help-access-badge" data-speed={color}>{type}</span>
+);
+
 export default function HelpPage() {
     return (
         <div className="help-page">
-            <h2>User Manual & Help</h2>
-            
-            <section>
-                <h3>1. Getting Started</h3>
-                <p>The Index Recommendation Engine is an interactive educational tool that analyzes SQL queries, checks your database schema, and deterministically recommends indexes that could speed up the query execution.</p>
+            <div className="help-hero">
+                <h2>User Manual &amp; Help</h2>
+                <p>Everything you need to use the Index Recommendation Engine effectively.</p>
+            </div>
+
+            <div className="help-toc">
+                {[
+                    '1. Getting Started', '2. Simulator', '3. Query Analysis',
+                    '4. Recommendations', '5. Simulation Controls', '6. MySQL EXPLAIN',
+                    '7. History', '8. Reports', '9. Light / Dark', '10. Troubleshooting'
+                ].map((item, i) => (
+                    <span key={i} className="help-toc-item">{item}</span>
+                ))}
+            </div>
+
+            <section className="help-section">
+                <h3><SectionIcon icon="🚀" /> 1. Getting Started</h3>
+                <p>
+                    The <strong>Index Recommendation Engine</strong> is an interactive educational tool that analyzes
+                    SQL queries, checks your database schema, and deterministically recommends indexes
+                    that could speed up query execution.
+                </p>
+                <div className="help-flow">
+                    {['Create Schema', 'Define Tables', 'Enter SQL', 'Analyze', 'Simulate', 'Review'].map((s, i, arr) => (
+                        <React.Fragment key={s}>
+                            <span className="help-flow-step">{s}</span>
+                            {i < arr.length - 1 && <span className="help-flow-arrow">→</span>}
+                        </React.Fragment>
+                    ))}
+                </div>
             </section>
 
-            <section>
-                <h3>2. Simulator</h3>
-                <ul>
-                    <li><strong>Selecting a Schema:</strong> Before running an analysis, you must select an active database schema from the dropdown menu on the Simulator page. (You can create schemas in the <em>Schema Management</em> tab).</li>
-                    <li><strong>Entering SQL:</strong> Type or paste your <code>SELECT</code> query into the text area.</li>
-                    <li><strong>Analyze Query:</strong> Click this button to run the engine. The system will securely parse the AST and process recommendations.</li>
-                    <li><strong>Start Interactive Simulation:</strong> Once analyzed, click this to visualize the step-by-step pipeline.</li>
-                </ul>
+            <section className="help-section">
+                <h3><SectionIcon icon="⬡" /> 2. Simulator</h3>
+                <Step n="1" label="Select Schema" desc="Choose your active schema from the dropdown (create one in Schema Management first)." />
+                <Step n="2" label="Enter SQL" desc="Type or paste a SELECT query into the editor. Use the sample queries for quick tests." />
+                <Step n="3" label="Analyze Query" desc="Click the Analyze button to run AST parsing and index scoring." />
+                <Step n="4" label="Start Simulation" desc="Walk through all 10 pipeline steps interactively once analysis is complete." />
             </section>
 
-            <section>
-                <h3>3. Query Analysis</h3>
-                <p>During analysis, the engine extracts key clauses from your query to understand its behavior:</p>
-                <ul>
-                    <li><strong>Tables & Columns:</strong> Identifies which tables are queried and which columns are selected.</li>
-                    <li><strong>WHERE:</strong> Filters are extracted and categorized (e.g., equality, range).</li>
-                    <li><strong>JOIN:</strong> Identifies foreign-key table links.</li>
-                    <li><strong>ORDER BY / GROUP BY / HAVING:</strong> Sorting and grouping logic is parsed to structure composite index ends.</li>
-                </ul>
+            <section className="help-section">
+                <h3><SectionIcon icon="🔍" /> 3. Query Analysis</h3>
+                <p>The engine extracts the following from your query:</p>
+                <div className="help-clause-grid">
+                    {[
+                        { clause: 'WHERE', icon: '🎯', desc: 'Equality and range filters — primary index candidates.' },
+                        { clause: 'JOIN', icon: '🔗', desc: 'Foreign key links between tables.' },
+                        { clause: 'ORDER BY', icon: '↕', desc: 'Sorting columns — appended to composite index.' },
+                        { clause: 'GROUP BY', icon: '📊', desc: 'Grouping columns — similar to ORDER BY optimization.' },
+                    ].map(c => (
+                        <div key={c.clause} className="help-clause-card">
+                            <span className="help-clause-icon">{c.icon}</span>
+                            <code className="help-clause-name">{c.clause}</code>
+                            <p>{c.desc}</p>
+                        </div>
+                    ))}
+                </div>
             </section>
 
-            <section>
-                <h3>4. Recommendation Results</h3>
-                <p>The engine uses a deterministic scoring system:</p>
-                <ul>
-                    <li><strong>Candidate Indexes:</strong> All logically possible indexes derived from the query.</li>
-                    <li><strong>Score Breakdown:</strong> Points are added for covering columns or equality constraints; points are deducted for poor range placements.</li>
-                    <li><strong>Existing/Redundant Indexes:</strong> Automatically excludes candidates that are already covered by indexes in your schema.</li>
-                    <li><strong>Final Recommendation:</strong> The highest-scoring candidate that surpasses the minimum threshold.</li>
-                </ul>
+            <section className="help-section">
+                <h3><SectionIcon icon="⚡" /> 4. Recommendation Results</h3>
+                <p>The engine uses a <strong>deterministic scoring system</strong>:</p>
+                <div className="help-score-table">
+                    <div className="help-score-row header">
+                        <span>Factor</span><span>Points</span>
+                    </div>
+                    {[
+                        ['Equality / exact WHERE match', '+30'],
+                        ['JOIN condition', '+25'],
+                        ['Range condition (>, <, BETWEEN)', '+20'],
+                        ['ORDER BY clause', '+20'],
+                        ['GROUP BY clause', '+15'],
+                    ].map(([label, pts]) => (
+                        <div className="help-score-row" key={label}>
+                            <span>{label}</span>
+                            <span className="help-score-pts">{pts}</span>
+                        </div>
+                    ))}
+                </div>
+                <div className="educational-note">
+                    <strong>Note:</strong> These are project heuristic scores — not MySQL optimizer costs. They guide index design decisions, not runtime guarantees.
+                </div>
             </section>
 
-            <section>
-                <h3>5. Visualization Controls</h3>
-                <p>While running the simulation, you can control playback using the bottom bar:</p>
-                <ul>
-                    <li><strong>Start/Autoplay:</strong> Automatically advances the pipeline every 2.5 seconds.</li>
-                    <li><strong>Next / Previous:</strong> Manually navigate through the steps.</li>
-                    <li><strong>Reset:</strong> Exit the simulation and return to the main query input view.</li>
-                </ul>
+            <section className="help-section">
+                <h3><SectionIcon icon="▶" /> 5. Simulation Controls</h3>
+                <div className="help-controls-row">
+                    {[
+                        { key: 'Auto Play', desc: 'Advances every 2.5s automatically' },
+                        { key: 'Next →', desc: 'Go to the next step manually' },
+                        { key: '← Prev', desc: 'Go back to the previous step' },
+                        { key: 'Reset', desc: 'Exit simulation and return to input' },
+                    ].map(c => (
+                        <div key={c.key} className="help-control-card">
+                            <code className="help-control-key">{c.key}</code>
+                            <p>{c.desc}</p>
+                        </div>
+                    ))}
+                </div>
             </section>
 
-            <section>
-                <h3>6. MySQL EXPLAIN Interpretation</h3>
-                <p>Step 9 runs your query through the real MySQL Optimizer using <code>EXPLAIN FORMAT=TRADITIONAL</code>. Key fields include:</p>
-                <ul>
-                    <li><code>possible_keys</code>: Indexes MySQL considers logically applicable.</li>
-                    <li><code>key</code>: The single index MySQL actually chooses to use.</li>
-                    <li><code>type</code> (Access Type): How MySQL retrieves rows. 
-                        <ul>
-                            <li><strong>const/eq_ref:</strong> Extremely fast (usually primary key lookups).</li>
-                            <li><strong>ref:</strong> Good speed (matching a non-unique index).</li>
-                            <li><strong>range:</strong> Moderate speed (scanning a subset of an index).</li>
-                            <li><strong>index/ALL:</strong> Slow (scanning the entire index or full table).</li>
-                        </ul>
-                    </li>
-                    <li><code>rows</code>: The estimated number of rows MySQL expects to read.</li>
-                    <li><code>Extra</code>: Additional optimizer notes (e.g., "Using index").</li>
-                </ul>
+            <section className="help-section">
+                <h3><SectionIcon icon="🗄" /> 6. MySQL EXPLAIN Interpretation</h3>
+                <p>Step 10 runs your query through the real MySQL optimizer using <code>EXPLAIN FORMAT=TRADITIONAL</code>. Key fields:</p>
+                <div className="help-explain-grid">
+                    <div className="help-explain-field">
+                        <code>possible_keys</code>
+                        <p>Indexes MySQL <em>considered</em> using — does NOT mean they were used.</p>
+                    </div>
+                    <div className="help-explain-field highlight">
+                        <code>key</code>
+                        <p>The single index MySQL <strong>actually chose</strong>. This is the important one.</p>
+                    </div>
+                    <div className="help-explain-field">
+                        <code>type</code>
+                        <p>Access method. Speed order:</p>
+                        <div className="help-access-badges">
+                            <AccessBadge type="const" color="fast" />
+                            <AccessBadge type="eq_ref" color="fast" />
+                            <AccessBadge type="ref" color="good" />
+                            <AccessBadge type="range" color="ok" />
+                            <AccessBadge type="index" color="slow" />
+                            <AccessBadge type="ALL" color="slow" />
+                        </div>
+                    </div>
+                    <div className="help-explain-field">
+                        <code>rows</code>
+                        <p>Estimated rows MySQL expects to read — lower is better.</p>
+                    </div>
+                    <div className="help-explain-field">
+                        <code>Extra</code>
+                        <p>Additional optimizer notes, e.g. "Using index" (covering index) or "Using filesort".</p>
+                    </div>
+                </div>
             </section>
 
-            <section>
-                <h3>7. History</h3>
-                <p>After analysis, you can click <strong>Save Analysis</strong>. Visit the <strong>History</strong> tab to see a list of your saved sessions. Opening a previous analysis lets you view the exact stored results without re-running the database query.</p>
+            <section className="help-section">
+                <h3><SectionIcon icon="📋" /> 7. History</h3>
+                <p>After analysis, click <strong>Save Analysis</strong>. The History tab stores all saved sessions. Reopen any record to view the exact stored results without re-running the query.</p>
             </section>
 
-            <section>
-                <h3>8. Reports & 9. Download</h3>
-                <p>While viewing a saved analysis in the <strong>History</strong> tab, you can download a generated report. The buttons provided are:</p>
-                <ul>
-                    <li><strong>TXT:</strong> A plain text summary of the query and recommendations.</li>
-                    <li><strong>PDF:</strong> A professional, formatted document.</li>
-                    <li><strong>DOCX:</strong> A Microsoft Word compatible file containing the analytical breakdown.</li>
-                </ul>
-            </section>
-            
-            <section>
-                <h3>10. Light / Dark Mode</h3>
-                <p>Click the <code>☀ / ☾</code> toggle button in the top navigation bar to switch between Light and Dark themes. Your preference is saved automatically in your browser.</p>
+            <section className="help-section">
+                <h3><SectionIcon icon="📥" /> 8. Reports &amp; Downloads</h3>
+                <div className="help-dl-grid">
+                    <div className="help-dl-card"><span>TXT</span><p>Plain text summary of query and recommendations.</p></div>
+                    <div className="help-dl-card"><span>PDF</span><p>Professional formatted document for printing or sharing.</p></div>
+                    <div className="help-dl-card"><span>DOCX</span><p>Microsoft Word compatible analytical breakdown.</p></div>
+                </div>
             </section>
 
-            <section>
-                <h3>11. Troubleshooting</h3>
-                <ul>
-                    <li><strong>Invalid SQL Error:</strong> Ensure your query is a valid <code>SELECT</code> statement. The system restricts updates/deletes for security.</li>
-                    <li><strong>Missing Schema:</strong> Ensure you have created tables in the Schema Management tab and selected it from the dropdown.</li>
-                    <li><strong>No Recommendation Generated:</strong> The engine determined that existing indexes (like Primary Keys) already perfectly cover the query, or the filter is too low-selectivity (e.g. <code>boolean = true</code>) to warrant an index.</li>
-                    <li><strong>EXPLAIN Unavailable:</strong> Ensure the database connection is healthy in the System Status panel.</li>
-                    <li><strong>Empty History:</strong> You must click "Save Analysis" on the simulator page to store history.</li>
-                    <li><strong>Report Generation Failure:</strong> Ensure the backend service is running and Python formatting dependencies are active.</li>
-                </ul>
+            <section className="help-section">
+                <h3><SectionIcon icon="☾" /> 9. Light / Dark Mode</h3>
+                <p>Click the <code>☀ / ☾</code> toggle in the top navigation bar. Your preference is automatically saved in your browser's local storage.</p>
+            </section>
+
+            <section className="help-section help-trouble-section">
+                <h3><SectionIcon icon="🔧" /> 10. Troubleshooting</h3>
+                <div className="help-trouble-grid">
+                    {[
+                        { issue: 'Invalid SQL Error', fix: 'Ensure your query is a valid SELECT statement. DML queries (UPDATE, DELETE) are blocked for security.' },
+                        { issue: 'Missing Schema', fix: 'Create tables in Schema Management first, then select the schema from the dropdown.' },
+                        { issue: 'No Recommendation', fix: 'Existing indexes (like PKs) may already cover the query, or the column has low selectivity (e.g., boolean = true).' },
+                        { issue: 'EXPLAIN Unavailable', fix: 'Check that the database connection is healthy in the System Status panel on the Simulator page.' },
+                        { issue: 'Empty History', fix: 'You must click "Save Analysis" on the Simulator page to persist a session.' },
+                        { issue: 'Report Download Fails', fix: 'Ensure the FastAPI backend is running and all Python dependencies are installed.' },
+                    ].map(t => (
+                        <div key={t.issue} className="help-trouble-card">
+                            <div className="help-trouble-issue">⚠ {t.issue}</div>
+                            <p>{t.fix}</p>
+                        </div>
+                    ))}
+                </div>
             </section>
         </div>
     );

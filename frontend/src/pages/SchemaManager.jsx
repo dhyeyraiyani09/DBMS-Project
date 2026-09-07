@@ -128,7 +128,28 @@ function SchemaManager() {
                 </div>
 
                 <div className="main-content">
-                    {!selectedSchema ? <p>Select a schema to view or manage.</p> : (
+                    {!selectedSchema ? (
+                        <div className="schema-empty-state">
+                            <div className="schema-empty-icon">🗄</div>
+                            <h3>No Schema Selected</h3>
+                            <p>Select a schema from the list to view tables, columns, indexes, and relationships.</p>
+                            <div className="schema-empty-diagram">
+                                <div className="sed-node sed-schema">Schema</div>
+                                <div className="sed-arrow">↓</div>
+                                <div className="sed-row">
+                                    <div className="sed-node sed-table">Table A</div>
+                                    <div className="sed-node sed-table">Table B</div>
+                                </div>
+                                <div className="sed-arrow">↓</div>
+                                <div className="sed-row">
+                                    <div className="sed-node sed-col">Columns</div>
+                                    <div className="sed-node sed-idx">Indexes</div>
+                                    <div className="sed-node sed-fk">FKs</div>
+                                </div>
+                            </div>
+                            <p className="schema-empty-hint">Create a new schema using the form on the left, then add tables and columns to get started.</p>
+                        </div>
+                    ) : (
                         <div>
                             <h3>Schema: {selectedSchema.name}</h3>
                             

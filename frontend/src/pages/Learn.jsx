@@ -1,129 +1,239 @@
 import React from 'react';
 
+const Callout = ({ icon, title, children }) => (
+    <div className="learn-callout">
+        <div className="learn-callout-icon">{icon}</div>
+        <div>
+            <strong className="learn-callout-title">{title}</strong>
+            <div className="learn-callout-body">{children}</div>
+        </div>
+    </div>
+);
+
 export default function LearnPage() {
     return (
         <div className="learn-page">
-            <h2>Learn About Database Indexes</h2>
+            <div className="learn-hero">
+                <h2>Learn: Database Indexes</h2>
+                <p>A structured guide to understanding how indexes work and how this engine recommends them.</p>
+            </div>
 
-            <section>
-                <h3>What is an Index?</h3>
-                <p>
-                    A database index is a data structure (often a B-Tree) that improves the speed of data retrieval operations on a database table at the cost of additional writes and storage space. 
-                    Think of it like an index at the back of a book. Instead of reading every page to find a topic (a full table scan), you look it up in the index to find the exact page number.
-                </p>
-                <p>
-                    Indexes directly relate to the <strong>predicates</strong> (conditions) in your SQL queries. When you filter data using <code>WHERE</code>, or sort using <code>ORDER BY</code>, an index allows the database engine to quickly locate the relevant rows without examining the entire table.
-                </p>
-            </section>
-
-            <section>
-                <h3>Why Indexes Matter</h3>
-                <ul>
-                    <li><strong>WHERE clauses:</strong> Indexes allow the database to quickly jump to rows matching specific conditions (e.g., <code>WHERE age &gt; 25</code>).</li>
-                    <li><strong>JOIN operations:</strong> When linking tables, indexes on the foreign key columns dramatically speed up the matching process.</li>
-                    <li><strong>ORDER BY & GROUP BY:</strong> Since indexes store data in a sorted order, they can sometimes completely eliminate the need for a separate sorting step in query execution.</li>
-                </ul>
-                <div className="educational-note" style={{ padding: '1rem', borderRadius: '4px', marginTop: '1rem' }}>
-                    <strong>Note:</strong> Indexes are not automatically beneficial for every query. They consume memory/disk space and slow down <code>INSERT</code>, <code>UPDATE</code>, and <code>DELETE</code> operations because the index must be updated alongside the table.
+            {/* Section 1 */}
+            <section className="learn-section">
+                <h3>What is a Database Index?</h3>
+                <div className="learn-two-col">
+                    <div>
+                        <p>
+                            A database index is a data structure — most commonly a <strong>B-Tree</strong> — that
+                            improves the speed of data retrieval at the cost of additional writes and storage.
+                            Think of it like an index at the back of a textbook: instead of scanning every page
+                            (full table scan), you jump directly to the relevant entry.
+                        </p>
+                        <p>
+                            Indexes directly relate to the <strong>predicates</strong> in SQL queries. When you filter
+                            with <code>WHERE</code> or sort with <code>ORDER BY</code>, an index lets the engine locate
+                            relevant rows without examining the entire table.
+                        </p>
+                    </div>
+                    <div className="learn-diagram-box">
+                        <div className="learn-diagram-title">Without Index</div>
+                        <div className="learn-diagram-flow">
+                            <div className="learn-diagram-node">Full Table Scan</div>
+                            <div className="learn-diagram-arrow">↓</div>
+                            <div className="learn-diagram-node learn-diagram-slow">Read All N Rows</div>
+                            <div className="learn-diagram-arrow">↓</div>
+                            <div className="learn-diagram-node">Filter Results</div>
+                        </div>
+                        <hr className="learn-diagram-sep" />
+                        <div className="learn-diagram-title">With Index</div>
+                        <div className="learn-diagram-flow">
+                            <div className="learn-diagram-node">B-Tree Lookup</div>
+                            <div className="learn-diagram-arrow">↓</div>
+                            <div className="learn-diagram-node learn-diagram-fast">Read ~k Rows</div>
+                            <div className="learn-diagram-arrow">↓</div>
+                            <div className="learn-diagram-node">Return Results</div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
-            <section>
+            {/* Section 2 */}
+            <section className="learn-section">
+                <h3>Why Indexes Matter</h3>
+                <div className="learn-clause-cards">
+                    {[
+                        { clause: 'WHERE', icon: '🎯', color: 'eq', desc: 'Indexes allow the engine to jump directly to matching rows instead of reading the full table.' },
+                        { clause: 'JOIN', icon: '🔗', color: 'join', desc: 'Indexes on foreign-key columns dramatically speed up table linking operations.' },
+                        { clause: 'ORDER BY', icon: '↕', color: 'ord', desc: 'Since B-Trees store data sorted, an index can eliminate costly filesort operations.' },
+                        { clause: 'GROUP BY', icon: '📊', color: 'grp', desc: 'Similar to ORDER BY — the sorted structure enables efficient grouping.' },
+                    ].map(c => (
+                        <div key={c.clause} className={`learn-clause-card learn-clause-${c.color}`}>
+                            <div className="learn-clause-header">
+                                <span>{c.icon}</span>
+                                <code>{c.clause}</code>
+                            </div>
+                            <p>{c.desc}</p>
+                        </div>
+                    ))}
+                </div>
+                <Callout icon="⚠" title="Trade-off">
+                    Indexes are not always beneficial. They consume disk space and slow down <code>INSERT</code>,
+                    <code> UPDATE</code>, and <code>DELETE</code> because the index structure must be updated alongside the table.
+                </Callout>
+            </section>
+
+            {/* Section 3 */}
+            <section className="learn-section">
                 <h3>Types of Indexes</h3>
-                <ul>
-                    <li><strong>Single-column index:</strong> An index created on just one column.</li>
-                    <li><strong>Composite index:</strong> An index created on multiple columns.</li>
-                    <li><strong>Primary key index:</strong> A unique index created automatically on a table's primary key column.</li>
-                    <li><strong>Unique index:</strong> Guarantees that all values in the indexed column(s) are distinct.</li>
-                    <li><strong>Covering index:</strong> An index that contains all the columns required to satisfy a query, allowing the database to fetch the results directly from the index without reading the actual table rows.</li>
-                </ul>
+                <div className="learn-type-grid">
+                    {[
+                        { name: 'Single-Column', icon: '▪', desc: 'Index on one column. Simple and effective for WHERE equality on that column.' },
+                        { name: 'Composite', icon: '▪▪', desc: 'Index on multiple columns. Column order matters — leftmost-prefix rule applies.' },
+                        { name: 'Primary Key', icon: '🔑', desc: 'Unique index created automatically on the primary key. Always the fastest lookup.' },
+                        { name: 'Unique Index', icon: '✓', desc: 'Guarantees all values in the indexed column(s) are distinct.' },
+                        { name: 'Covering Index', icon: '⬡', desc: 'Contains all columns needed by a query — avoids reading the actual table rows entirely.' },
+                    ].map(t => (
+                        <div key={t.name} className="learn-type-card">
+                            <div className="learn-type-icon">{t.icon}</div>
+                            <div>
+                                <div className="learn-type-name">{t.name}</div>
+                                <p>{t.desc}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </section>
 
-            <section>
+            {/* Section 4 — Composite Index */}
+            <section className="learn-section">
                 <h3>Understanding Composite Indexes</h3>
-                <p>
-                    A composite index spans multiple columns. The <strong>order</strong> of columns is critical due to the <em>leftmost-prefix rule</em>.
-                </p>
-                <p>
-                    For example, consider an index on <code>(user_id, order_date)</code>:
-                </p>
-                <ul>
-                    <li>It can speed up queries filtering by <em>both</em> <code>user_id</code> and <code>order_date</code>.</li>
-                    <li>It can speed up queries filtering by <em>just</em> <code>user_id</code>.</li>
-                    <li>It <strong>cannot</strong> effectively speed up queries filtering by <em>just</em> <code>order_date</code>.</li>
-                </ul>
-                <p>
-                    <strong>Rule of thumb:</strong> Equality conditions (<code>=</code>) commonly come first, followed by sorting/grouping columns, while range conditions (<code>&gt;</code>, <code>&lt;</code>) are generally considered later.
-                </p>
+                <div className="learn-two-col">
+                    <div>
+                        <p>
+                            A composite index spans multiple columns. The <strong>order</strong> of columns is critical
+                            due to the <em>leftmost-prefix rule</em>.
+                        </p>
+                        <p>Consider an index on <code>(user_id, order_date)</code>:</p>
+                        <div className="learn-prefix-list">
+                            <div className="learn-prefix-row learn-prefix-ok">✓ <code>WHERE user_id = 5</code> — uses index (leftmost prefix)</div>
+                            <div className="learn-prefix-row learn-prefix-ok">✓ <code>WHERE user_id = 5 AND order_date &gt; '2024'</code> — uses full index</div>
+                            <div className="learn-prefix-row learn-prefix-bad">✗ <code>WHERE order_date &gt; '2024'</code> — cannot use index (skips first column)</div>
+                        </div>
+                        <Callout icon="💡" title="Column Order Rule of Thumb">
+                            Equality conditions (<code>=</code>) first, then sorting/grouping, then range conditions (<code>&gt;</code>, <code>&lt;</code>).
+                        </Callout>
+                    </div>
+                    <div className="learn-composite-diagram">
+                        <div className="learn-comp-title">Index: (user_id, order_date)</div>
+                        <div className="learn-comp-col learn-comp-eq">
+                            <div className="learn-comp-col-tag">Equality</div>
+                            <code>user_id</code>
+                        </div>
+                        <div className="learn-comp-arrow">↓</div>
+                        <div className="learn-comp-col learn-comp-ord">
+                            <div className="learn-comp-col-tag">Sort / Range</div>
+                            <code>order_date</code>
+                        </div>
+                    </div>
+                </div>
             </section>
 
-            <section>
-                <h3>Existing Indexes & Selectivity</h3>
-                <p>
-                    Before recommending a new index, a smart engine checks for <strong>Existing Indexes</strong> to avoid redundancy. Creating duplicate indexes wastes space and slows down writes.
-                </p>
-                <p>
-                    <strong>Selectivity</strong> refers to how many unique values exist in a column relative to the total rows. 
-                    High-selectivity columns (like email addresses) are excellent for filtering because they quickly narrow down the results. 
-                    Low-selectivity columns (like boolean <code>is_active</code>) may provide little to no benefit because the database still has to read a massive portion of the table, often making a full table scan faster than using the index.
-                </p>
-            </section>
-
-            <section>
+            {/* Section 5 — Engine */}
+            <section className="learn-section">
                 <h3>How the Recommendation Engine Works</h3>
-                <p>This project uses a deterministic and transparent process:</p>
-                <ol>
-                    <li><strong>SQL Query:</strong> The user provides a raw SQL string.</li>
-                    <li><strong>Parse Query:</strong> The engine translates the SQL into an Abstract Syntax Tree (AST).</li>
-                    <li><strong>Detect Operations:</strong> The engine identifies tables, filters (WHERE), JOINs, and sorting (ORDER BY).</li>
-                    <li><strong>Generate Candidates:</strong> Potential index combinations are mapped based on column usage.</li>
-                    <li><strong>Check Existing Indexes:</strong> The schema is queried to discard redundant candidates.</li>
-                    <li><strong>Score Candidates:</strong> A heuristic algorithm awards points for exact matches, covering indexes, and penalizes range misplacements.</li>
-                    <li><strong>Rank Candidates:</strong> Candidates are thresholded to provide a final recommendation.</li>
-                    <li><strong>Analyze MySQL EXPLAIN:</strong> We run the query through MySQL's actual optimizer to see its physical execution path.</li>
-                </ol>
-                <p>
-                    <em>Note: The heuristic recommendation score is distinct from the MySQL optimizer's EXPLAIN information. Heuristics guide structural database design, whereas EXPLAIN shows the physical execution plan. Neither guarantees a specific runtime measurement without benchmarking.</em>
-                </p>
+                <p>This project uses a deterministic, transparent 10-step process:</p>
+                <div className="learn-pipeline">
+                    {[
+                        { n: '1', label: 'SQL Query', desc: 'User provides a raw SQL string.' },
+                        { n: '2', label: 'Parse (AST)', desc: 'SQLGlot translates the SQL into an Abstract Syntax Tree.' },
+                        { n: '3', label: 'Detect Operations', desc: 'Tables, filters, JOINs, and sorting are identified.' },
+                        { n: '4', label: 'Generate Candidates', desc: 'Potential index combinations are mapped from column usage.' },
+                        { n: '5', label: 'Check Existing Indexes', desc: 'Schema is queried to discard redundant candidates.' },
+                        { n: '6', label: 'Score Candidates', desc: 'Heuristic points awarded: WHERE +30, JOIN +25, Range +20, ORDER BY +20, GROUP BY +15.' },
+                        { n: '7', label: 'Rank Candidates', desc: 'Scores are sorted; top candidate above threshold is recommended.' },
+                        { n: '8', label: 'Deep Dive', desc: 'Composite index column ordering is analyzed and explained.' },
+                        { n: '9', label: 'Recommendation', desc: 'Final recommendation with score breakdown is presented.' },
+                        { n: '10', label: 'MySQL EXPLAIN', desc: 'The query is run through MySQL\'s actual optimizer to show the physical execution path.' },
+                    ].map((step, i) => (
+                        <div key={step.n} className="learn-pipeline-step">
+                            <div className="learn-pipeline-num">{step.n}</div>
+                            <div className="learn-pipeline-body">
+                                <div className="learn-pipeline-label">{step.label}</div>
+                                <div className="learn-pipeline-desc">{step.desc}</div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+                <Callout icon="ℹ" title="Heuristics vs. EXPLAIN">
+                    The heuristic recommendation score is distinct from the MySQL optimizer's EXPLAIN information.
+                    Heuristics guide structural database design; EXPLAIN shows the physical execution plan.
+                    Neither guarantees specific runtime performance without benchmarking.
+                </Callout>
             </section>
 
-            <section>
+            {/* Section 6 — Selectivity */}
+            <section className="learn-section">
+                <h3>Existing Indexes &amp; Selectivity</h3>
+                <p>
+                    Before recommending a new index, the engine checks for <strong>Existing Indexes</strong> to avoid
+                    redundancy. Creating duplicate indexes wastes space and slows down write operations.
+                </p>
+                <div className="learn-selectivity-compare">
+                    <div className="learn-select-card learn-select-high">
+                        <div className="learn-select-label">High Selectivity ✓</div>
+                        <code>email</code>, <code>order_id</code>
+                        <p>Many unique values — index quickly narrows results. Excellent for indexing.</p>
+                    </div>
+                    <div className="learn-select-card learn-select-low">
+                        <div className="learn-select-label">Low Selectivity ✗</div>
+                        <code>is_active</code>, <code>status</code>
+                        <p>Few unique values — index still reads most rows. Full table scan may be faster.</p>
+                    </div>
+                </div>
+            </section>
+
+            {/* Section 7 — Video */}
+            <section className="learn-section">
                 <h3>Educational Video</h3>
                 <p>Watch this video to visually understand how B-Tree indexes traverse data:</p>
-                <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', maxWidth: '100%' }}>
-                    {/* Placeholder embedding an educational video from a reputable source (e.g. Hussein Nasser or ByteByteGo) */}
-                    <iframe 
-                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                        src="https://www.youtube-nocookie.com/embed/fsG1XaZEa78" 
-                        title="Database Indexing Explained" 
-                        frameBorder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowFullScreen>
-                    </iframe>
+                <div className="learn-video-wrapper">
+                    <iframe
+                        src="https://www.youtube-nocookie.com/embed/fsG1XaZEa78"
+                        title="Database Indexing Explained"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                    />
                 </div>
-                <p style={{ fontSize: '0.85rem', color: 'gray', marginTop: '0.5rem' }}>Source: "Database Indexing Explained (with PostgreSQL)" by Hussein Nasser (Educational link only).</p>
+                <p className="learn-video-credit">Source: "Database Indexing Explained (with PostgreSQL)" by Hussein Nasser — Educational reference only.</p>
             </section>
 
-            <section>
+            {/* Section 8 — References */}
+            <section className="learn-section">
                 <h3>References</h3>
-                
-                <h4>Books</h4>
-                <ul>
-                    <li><em>Database System Concepts</em> by Abraham Silberschatz, Henry F. Korth, and S. Sudarshan</li>
-                    <li><em>Fundamentals of Database Systems</em> by Ramez Elmasri and Shamkant B. Navathe</li>
-                </ul>
-                
-                <h4>Official Documentation</h4>
-                <ul>
-                    <li><a href="https://dev.mysql.com/doc/refman/8.0/en/optimization-indexes.html" target="_blank" rel="noopener noreferrer">MySQL 8.0 Reference Manual: Optimization and Indexes</a></li>
-                    <li><a href="https://sqlglot.com/sqlglot.html" target="_blank" rel="noopener noreferrer">SQLGlot AST Parsing Documentation</a></li>
-                </ul>
-                
-                <h4>Educational Resources & Videos</h4>
-                <ul>
-                    <li><a href="https://use-the-index-luke.com/" target="_blank" rel="noopener noreferrer">Use The Index, Luke! - A Guide to Database Performance</a></li>
-                    <li>Hussein Nasser - Database Engineering Tutorials (YouTube)</li>
-                </ul>
+                <div className="learn-refs-grid">
+                    <div className="learn-ref-group">
+                        <div className="learn-ref-group-title">Books</div>
+                        <ul>
+                            <li><em>Database System Concepts</em> — Silberschatz, Korth, Sudarshan</li>
+                            <li><em>Fundamentals of Database Systems</em> — Elmasri &amp; Navathe</li>
+                        </ul>
+                    </div>
+                    <div className="learn-ref-group">
+                        <div className="learn-ref-group-title">Official Documentation</div>
+                        <ul>
+                            <li><a href="https://dev.mysql.com/doc/refman/8.0/en/optimization-indexes.html" target="_blank" rel="noopener noreferrer">MySQL 8.0 — Optimization and Indexes</a></li>
+                            <li><a href="https://sqlglot.com/sqlglot.html" target="_blank" rel="noopener noreferrer">SQLGlot AST Parsing Documentation</a></li>
+                        </ul>
+                    </div>
+                    <div className="learn-ref-group">
+                        <div className="learn-ref-group-title">Educational Resources</div>
+                        <ul>
+                            <li><a href="https://use-the-index-luke.com/" target="_blank" rel="noopener noreferrer">Use The Index, Luke!</a></li>
+                            <li>Hussein Nasser — Database Engineering (YouTube)</li>
+                        </ul>
+                    </div>
+                </div>
             </section>
         </div>
     );
