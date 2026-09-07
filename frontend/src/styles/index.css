@@ -1133,7 +1133,7 @@ pre {
   align-items: flex-start;
   gap: 1.25rem;
   padding: 1.75rem 2rem;
-  background: linear-gradient(135deg, var(--header-bg) 0%, #2d2b6b 100%);
+  background: linear-gradient(135deg, #1b1f4a 0%, #302b70 100%);
   border-radius: var(--radius-lg);
   margin-bottom: 1.25rem;
   position: relative;
@@ -2164,5 +2164,280 @@ pre {
 .sed-arrow {
   color: var(--text-muted);
   font-size: 0.9rem;
+}
+
+
+/* =====================================================
+   DEVELOPED BY — v2 THREE-STUDENT LAYOUT
+   ===================================================== */
+.dev-section {
+  margin-bottom: 1.5rem;
+}
+
+.dev-section-label {
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Three-student horizontal row */
+.dev-students-row {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.dev-student-card-v2 {
+  flex: 1;
+  min-width: 180px;
+  max-width: 100%;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent);
+  border-radius: var(--radius-md);
+  padding: 1.5rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.dev-student-card-v2:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+[data-theme="dark"] .dev-student-card-v2:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-md), 0 0 0 1px rgba(99,102,241,0.25);
+}
+
+.dev-photo-ring-v2 {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  padding: 3px;
+  box-shadow: 0 0 0 4px var(--accent-light);
+}
+
+.dev-photo-placeholder-v2 {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--surface-raised, var(--table-header-bg));
+  border: 2px dashed var(--border-strong, var(--border));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+}
+
+.dev-photo-icon-v2 { font-size: 1.6rem; }
+.dev-photo-label-v2 { font-size: 0.58rem; color: var(--text-muted); }
+
+.dev-student-info-v2 {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+}
+
+.dev-student-name-v2 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.dev-student-reg-v2 {
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  color: var(--text-muted);
+  background: var(--surface-raised, var(--table-header-bg));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.2rem 0.5rem;
+  display: inline-block;
+}
+
+/* Guided By v2 */
+.dev-guide-card-v2 {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  max-width: 480px;
+}
+
+.dev-guide-avatar-v2 {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--accent-light);
+  border: 2px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.dev-guide-name-v2 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 0.15rem;
+}
+
+.dev-guide-role-v2 {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.dev-guide-dept-v2 {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.1rem;
+}
+
+/* Mobile: stack students */
+@media (max-width: 600px) {
+  .dev-students-row { flex-direction: column; }
+  .dev-student-card-v2 { max-width: 100%; }
+}
+
+/* =====================================================
+   DARK MODE — CYAN ACCENT REFINEMENTS
+   ===================================================== */
+
+/* Pipeline flow nodes — use cyan on dark */
+[data-theme="dark"] .pipeline-flow-node {
+  border-color: rgba(34,211,238,0.2);
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .pipeline-flow-accent {
+  border-color: var(--cyan) !important;
+  color: var(--cyan) !important;
+  background: rgba(34,211,238,0.08) !important;
+}
+
+/* Status badges — ensure proper contrast on dark */
+[data-theme="dark"] .status-badge.status-connected {
+  background: rgba(52,211,153,0.12);
+  color: var(--success);
+  border: 1px solid rgba(52,211,153,0.3);
+}
+
+[data-theme="dark"] .status-badge.status-error {
+  background: rgba(251,113,133,0.1);
+  color: var(--danger);
+  border: 1px solid rgba(251,113,133,0.3);
+}
+
+[data-theme="dark"] .status-badge.status-checking {
+  background: rgba(251,191,36,0.08);
+  color: var(--warning);
+  border: 1px solid rgba(251,191,36,0.25);
+}
+
+/* Sim hero dark gradient */
+[data-theme="dark"] .sim-hero-card {
+  background: linear-gradient(135deg, #1b1f4a 0%, #302b70 100%);
+  border-color: rgba(99,102,241,0.25);
+}
+
+/* Better button contrast on dark */
+[data-theme="dark"] .btn-primary {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+[data-theme="dark"] .btn-primary:hover {
+  background: var(--accent-hover);
+}
+
+[data-theme="dark"] .btn-secondary {
+  background: var(--surface-raised);
+  color: var(--text-secondary);
+  border-color: var(--border-strong);
+}
+
+/* Learn page code highlights — cyan on dark */
+[data-theme="dark"] .learn-prefix-row code,
+[data-theme="dark"] .learn-pipeline-step code,
+[data-theme="dark"] .learn-callout-body code {
+  color: var(--cyan);
+  background: transparent;
+  border: none;
+}
+
+/* Help page code — cyan on dark */
+[data-theme="dark"] .help-section code,
+[data-theme="dark"] .help-section p code,
+[data-theme="dark"] .help-step-body code {
+  color: var(--cyan);
+  background: transparent;
+  border: none;
+}
+
+/* Score table pts — green on dark */
+[data-theme="dark"] .help-score-pts {
+  color: var(--success);
+}
+
+/* Improve card text contrast on dark */
+[data-theme="dark"] .learn-section p,
+[data-theme="dark"] .learn-section li,
+[data-theme="dark"] .help-section p,
+[data-theme="dark"] .help-section li {
+  color: var(--text-secondary);
+}
+
+/* Schema empty state diagram on dark */
+[data-theme="dark"] .schema-empty-diagram {
+  background: var(--surface-raised);
+  border-color: var(--border-strong);
+}
+
+/* AI tutor header on dark */
+[data-theme="dark"] .ai-tutor-header {
+  background: linear-gradient(135deg, #070c18 0%, #1b1f4a 100%);
+}
+
+/* History detail border */
+[data-theme="dark"] .history-detail {
+  background: var(--surface-raised);
+  border-color: var(--border);
+}
+
+/* DB table visualization */
+[data-theme="dark"] .db-table {
+  border-color: var(--accent);
+}
+
+[data-theme="dark"] .db-table-header {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Improve Simulation header on dark - slightly brighter */
+[data-theme="dark"] .simulation-header {
+  background: var(--header-bg) !important;
+  border-bottom: 1px solid var(--border) !important;
 }
 

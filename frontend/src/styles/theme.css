@@ -4,49 +4,53 @@
    ===================================================== */
 :root {
   /* Backgrounds */
-  --bg-color: #f0f2f7;
+  --bg-color: #f0f4f8;
   --surface-color: #ffffff;
-  --surface-raised: #f8fafc;
+  --surface-raised: #f7f9fc;
 
   /* Text */
-  --text-primary: #1a202c;
-  --text-secondary: #4a5568;
-  --text-muted: #718096;
-  --text-color: #1a202c; /* alias for legacy refs */
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --text-color: #0f172a;
 
   /* Brand Accent — Indigo */
-  --accent: #4f46e5;
-  --accent-hover: #4338ca;
+  --accent: #6366f1;
+  --accent-hover: #818cf8;
   --accent-light: #eef2ff;
 
+  /* Cyan secondary accent */
+  --cyan: #22d3ee;
+  --cyan-light: #ecfeff;
+
   /* Semantic colors */
-  --success: #059669;
+  --success: #10b981;
   --success-light: #ecfdf5;
-  --warning: #d97706;
+  --warning: #f59e0b;
   --warning-light: #fffbeb;
-  --danger: #dc2626;
-  --danger-light: #fef2f2;
+  --danger: #fb7185;
+  --danger-light: #fff1f2;
 
   /* Borders */
   --border: #e2e8f0;
-  --border-strong: #cbd5e0;
+  --border-strong: #cbd5e1;
 
   /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.12), 0 4px 6px -2px rgba(0,0,0,0.06);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -1px rgba(0,0,0,0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
   --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
-  --accent-glow: 0 0 20px rgba(79,70,229,0.25);
+  --accent-glow: 0 0 20px rgba(99,102,241,0.2);
 
   /* Border radii */
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
 
-  /* Header */
-  --header-bg: #1e1b4b;
+  /* Header — deep navy */
+  --header-bg: #0f172a;
   --header-text: #ffffff;
-  --nav-link: rgba(255,255,255,0.8);
+  --nav-link: rgba(255,255,255,0.72);
   --nav-link-active: #ffffff;
 
   /* Cards */
@@ -55,28 +59,28 @@
 
   /* Sidebar */
   --sidebar-border: #e2e8f0;
-  --sidebar-hover: #f0f2f7;
+  --sidebar-hover: #f0f4f8;
 
   /* Inputs */
   --input-bg: #ffffff;
-  --input-text: #1a202c;
-  --input-border: #cbd5e0;
+  --input-text: #0f172a;
+  --input-border: #cbd5e1;
 
   /* Buttons */
-  --btn-primary-bg: #4f46e5;
+  --btn-primary-bg: #6366f1;
   --btn-primary-text: #ffffff;
-  --btn-secondary-bg: #f8fafc;
-  --btn-secondary-text: #4a5568;
+  --btn-secondary-bg: #f7f9fc;
+  --btn-secondary-text: #475569;
 
   /* Tables */
   --table-border: #e2e8f0;
-  --table-header-bg: #f8fafc;
-  --table-row-border: #f0f2f5;
+  --table-header-bg: #f7f9fc;
+  --table-row-border: #f0f4f8;
 
   /* Code */
-  --code-bg: #1e1b4b;
+  --code-bg: #0f172a;
   --code-text: #c7d2fe;
-  --code-border: #312e81;
+  --code-border: #1e293b;
 
   /* Educational notes */
   --edu-note-bg: #eef2ff;
@@ -84,62 +88,88 @@
 }
 
 /* =====================================================
-   Dark theme
+   Dark theme — Navy + Indigo + Cyan
    ===================================================== */
 [data-theme="dark"] {
-  --bg-color: #0f0f23;
-  --surface-color: #1a1a35;
-  --surface-raised: #212140;
+  /* Main background — deep navy */
+  --bg-color: #0b1020;
 
-  --text-primary: #f1f5f9;
+  /* Card surface — slightly lighter navy */
+  --surface-color: #121a2e;
+  --surface-raised: #171d36;
+
+  /* Text — high contrast on dark */
+  --text-primary: #e2e8f0;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
-  --text-color: #f1f5f9;
+  --text-color: #e2e8f0;
 
-  --accent: #818cf8;
-  --accent-hover: #a5b4fc;
+  /* Primary accent — bright indigo */
+  --accent: #6366f1;
+  --accent-hover: #818cf8;
   --accent-light: #1e1b4b;
 
+  /* Cyan secondary accent */
+  --cyan: #22d3ee;
+  --cyan-light: rgba(34,211,238,0.08);
+
+  /* Semantic */
   --success: #34d399;
   --success-light: rgba(52,211,153,0.1);
   --warning: #fbbf24;
-  --warning-light: rgba(251,191,36,0.1);
-  --danger: #f87171;
-  --danger-light: rgba(248,113,113,0.1);
+  --warning-light: rgba(251,191,36,0.08);
+  --danger: #fb7185;
+  --danger-light: rgba(251,113,133,0.1);
 
-  --border: #2d2d55;
-  --border-strong: #3d3d6b;
+  /* Borders — subtle on dark navy */
+  --border: #1e2a45;
+  --border-strong: #2d3a55;
 
-  --header-bg: #0d0d1f;
-  --header-text: #f1f5f9;
-  --nav-link: rgba(241,245,249,0.7);
-  --nav-link-active: #f1f5f9;
+  /* Shadows — deeper on dark */
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.35);
+  --shadow-lg: 0 10px 24px rgba(0,0,0,0.4);
+  --shadow-xl: 0 20px 40px rgba(0,0,0,0.5);
+  --accent-glow: 0 0 20px rgba(99,102,241,0.3);
 
-  --card-bg: #1a1a35;
-  --card-border: #2d2d55;
+  /* Header — darkest navy */
+  --header-bg: #070c18;
+  --header-text: #e2e8f0;
+  --nav-link: rgba(226,232,240,0.6);
+  --nav-link-active: #e2e8f0;
 
-  --sidebar-border: #2d2d55;
-  --sidebar-hover: #212140;
+  /* Cards */
+  --card-bg: #121a2e;
+  --card-border: #1e2a45;
 
-  --input-bg: #212140;
-  --input-text: #f1f5f9;
-  --input-border: #3d3d6b;
+  /* Sidebar */
+  --sidebar-border: #1e2a45;
+  --sidebar-hover: #171d36;
 
-  --btn-primary-bg: #818cf8;
-  --btn-primary-text: #0f0f23;
-  --btn-secondary-bg: #212140;
+  /* Inputs */
+  --input-bg: #171d36;
+  --input-text: #e2e8f0;
+  --input-border: #2d3a55;
+
+  /* Buttons */
+  --btn-primary-bg: #6366f1;
+  --btn-primary-text: #ffffff;
+  --btn-secondary-bg: #171d36;
   --btn-secondary-text: #94a3b8;
 
-  --table-border: #2d2d55;
-  --table-header-bg: #212140;
-  --table-row-border: #1e1e3d;
+  /* Tables */
+  --table-border: #1e2a45;
+  --table-header-bg: #171d36;
+  --table-row-border: #141c30;
 
-  --code-bg: #0d0d1f;
-  --code-text: #c7d2fe;
-  --code-border: #1e1b4b;
+  /* Code — darkest surface */
+  --code-bg: #070c18;
+  --code-text: #a5b4fc;
+  --code-border: #1e2a45;
 
-  --edu-note-bg: #1e1b4b;
-  --edu-note-border: #3730a3;
+  /* Educational notes */
+  --edu-note-bg: rgba(99,102,241,0.08);
+  --edu-note-border: rgba(99,102,241,0.3);
 }
 
 /* =====================================================
@@ -256,4 +286,46 @@ code, pre {
 .history-detail th,
 .history-detail td {
   border: 1px solid var(--table-border);
+}
+
+/* =====================================================
+   Cyan accent utilities
+   ===================================================== */
+
+/* Pipeline flow — use cyan for connectors */
+.pipeline-flow-connector {
+  color: var(--cyan) !important;
+}
+
+/* Simulation step dots — use cyan for completed */
+[data-theme="dark"] .step-dot.completed {
+  background: var(--cyan) !important;
+  border-color: var(--cyan) !important;
+}
+
+/* SQL-related highlights */
+[data-theme="dark"] code {
+  color: var(--cyan);
+  background-color: var(--code-bg);
+  border-color: var(--code-border);
+}
+
+[data-theme="dark"] .learn-page code,
+[data-theme="dark"] .help-page code {
+  color: var(--cyan);
+  background: transparent;
+  border: none;
+  font-weight: 600;
+}
+
+/* Simulation surface — use dark navy secondary surface */
+[data-theme="dark"] .simulation-content {
+  background: var(--surface-raised) !important;
+}
+
+/* Card lifted hover — consistent across dark */
+[data-theme="dark"] .feature-card:hover,
+[data-theme="dark"] .dev-feature-pill:hover {
+  border-color: var(--accent) !important;
+  box-shadow: var(--shadow-md), 0 0 0 1px rgba(99,102,241,0.3) !important;
 }
