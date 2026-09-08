@@ -192,21 +192,39 @@ class RecommendationEngine:
                 evidence[table_name]["group"].append(col_name)
                 self._add_factor(table_name, (col_name,), "GROUP_BY", SCORE_GROUP_BY, f"Column {col_name} is used in GROUP BY.")
 
-        # Composite Candidates (Equality -> Order/Group -> Range)
+        # Composite Candidates (Equality -> Join -> Order/Group -> Range)
         for table, ev in evidence.items():
             composite = []
-            # Sort sets for determinism
-            eq_cols = sorted(list(ev["equality"].union(ev["join"])))
-            composite.extend(eq_cols)
             
-            order_cols = ev["order"]
-            group_cols = ev["group"]
+            # 1. Equality / exact-match predicates
+            eq_cols = sorted(list(ev["equality"]))
+            for c in eq_cols:
+                if c not in composite:
+                    composite.append(c)
+                    
+            # 2. JOIN equality
+            join_cols = sorted(list(ev["join"]))
+            for c in join_cols:
+                if c not in composite:
+                    composite.append(c)
             
-            # Usually order or group, pick the first ones that aren't already in composite
+            # 3. ORDER BY / GROUP BY
+            # Maintain order of appearance, but deduplicate
+            order_cols = []
+            for c in ev["order"]:
+                if c not in order_cols:
+                    order_cols.append(c)
+            
+            group_cols = []
+            for c in ev["group"]:
+                if c not in group_cols:
+                    group_cols.append(c)
+            
             for c in group_cols + order_cols:
                 if c not in composite:
                     composite.append(c)
                     
+            # 4. Range predicates
             range_cols = sorted(list(ev["range"]))
             for c in range_cols:
                 if c not in composite:
@@ -215,17 +233,17 @@ class RecommendationEngine:
             if len(composite) > 1:
                 comp_tuple = tuple(composite)
                 # Combine evidence
-                for c in eq_cols:
+                for c in composite:
                     if c in ev["equality"]:
                         self._add_factor(table, comp_tuple, "WHERE_EQUALITY", SCORE_WHERE_EQUALITY, f"Column {c} is used in an equality predicate.")
                     if c in ev["join"]:
                         self._add_factor(table, comp_tuple, "JOIN", SCORE_JOIN, f"Column {c} is used in a JOIN condition.")
-                for c in order_cols:
-                    self._add_factor(table, comp_tuple, "ORDER_BY", SCORE_ORDER_BY, f"Column {c} is used in ORDER BY.")
-                for c in group_cols:
-                    self._add_factor(table, comp_tuple, "GROUP_BY", SCORE_GROUP_BY, f"Column {c} is used in GROUP BY.")
-                for c in range_cols:
-                    self._add_factor(table, comp_tuple, "WHERE_RANGE", SCORE_WHERE_RANGE, f"Column {c} is used in a range predicate.")
+                    if c in order_cols:
+                        self._add_factor(table, comp_tuple, "ORDER_BY", SCORE_ORDER_BY, f"Column {c} is used in ORDER BY.")
+                    if c in group_cols:
+                        self._add_factor(table, comp_tuple, "GROUP_BY", SCORE_GROUP_BY, f"Column {c} is used in GROUP BY.")
+                    if c in ev["range"]:
+                        self._add_factor(table, comp_tuple, "WHERE_RANGE", SCORE_WHERE_RANGE, f"Column {c} is used in a range predicate.")
                 
                 # Maintenance penalty
                 maintenance_penalty = (len(composite) - 1) * PENALTY_MAINTENANCE_PER_COL
