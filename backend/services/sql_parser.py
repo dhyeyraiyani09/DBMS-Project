@@ -11,12 +11,21 @@ def parse_sql(query: str, dialect: str = "mysql") -> exp.Expression:
     if not query or not query.strip():
         raise SQLParseError("Empty SQL query provided.")
     try:
-        # We use parse_one assuming a single statement
-        parsed = sqlglot.parse_one(query, read=dialect)
-        if not parsed:
-             raise SQLParseError("Could not parse SQL query.")
-        return parsed
+        parsed_statements = sqlglot.parse(query, read=dialect)
+        
+        # Remove any None entries that might result from trailing semicolons or empty statements
+        valid_statements = [stmt for stmt in parsed_statements if stmt is not None]
+        
+        if len(valid_statements) > 1:
+            raise SQLParseError("Only one SQL statement is allowed.")
+        if not valid_statements:
+            raise SQLParseError("Could not parse SQL query.")
+            
+        return valid_statements[0]
     except sqlglot.errors.ParseError as e:
         raise SQLParseError(f"Syntax error in SQL query: {str(e)}")
+    except SQLParseError:
+        raise
     except Exception as e:
         raise SQLParseError(f"Invalid SQL query: {str(e)}")
+

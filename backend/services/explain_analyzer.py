@@ -18,7 +18,11 @@ class ExplainAnalyzer:
         """
         Ensures the query is a safe SELECT statement to prevent destructive EXPLAIN execution.
         """
-        ast = parse_sql(self.query)
+        try:
+            ast = parse_sql(self.query)
+        except SQLParseError as e:
+            raise ExplainError(str(e))
+            
         # Check if the root node is a SELECT expression
         if not isinstance(ast, exp.Select):
             raise ExplainError("Only SELECT queries are allowed for EXPLAIN analysis. Destructive commands (INSERT, UPDATE, DELETE, CREATE, DROP, etc.) are prohibited.")
