@@ -100,6 +100,10 @@ export default function HelpPage() {
                         </div>
                     ))}
                 </div>
+                <div className="help-sub-desc">
+                    <p><strong>Composite Index Ordering:</strong> Columns are ordered deterministically by rule of thumb: Equality &rarr; JOIN &rarr; Sorting/Grouping &rarr; Range.</p>
+                    <p><strong>Existing/Redundant Indexes:</strong> The engine penalizes exact existing indexes (-100 pts) and redundant leftmost-prefix indexes (-30 pts) to prevent schema clutter.</p>
+                </div>
                 <div className="educational-note">
                     <strong>Note:</strong> These are project heuristic scores — not MySQL optimizer costs. They guide index design decisions, not runtime guarantees.
                 </div>
@@ -160,6 +164,11 @@ export default function HelpPage() {
             <section className="help-section">
                 <h3><SectionIcon icon="📋" /> 7. History</h3>
                 <p>After analysis, click <strong>Save Analysis</strong>. The History tab stores all saved sessions. Reopen any record to view the exact stored results without re-running the query.</p>
+            </section>
+
+            <section className="help-section">
+                <h3><SectionIcon icon="🤖" /> 7b. AI Tutor</h3>
+                <p>The <strong>AI Tutor</strong> (powered by Gemini) provides conversational, high-level guidance regarding database indexing concepts. It helps explain complex terms or suggest conceptual optimizations but does not override the deterministic recommendation engine.</p>
             </section>
 
             <section className="help-section">

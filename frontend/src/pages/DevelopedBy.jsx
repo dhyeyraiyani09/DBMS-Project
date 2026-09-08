@@ -55,9 +55,7 @@ export default function DevelopedByPage() {
                 <div className="dev-guide-card-v2">
                     <div className="dev-guide-avatar-v2">🎓</div>
                     <div className="dev-guide-info-v2">
-                        <div className="dev-guide-name-v2">Dr. Swaminathan A</div>
-                        <div className="dev-guide-role-v2">Assistant Professor</div>
-                        <div className="dev-guide-dept-v2">Department of Computer Science</div>
+                        <div className="dev-guide-name-v2">Dr. Swaminathan A, Assistant Professor</div>
                     </div>
                 </div>
             </section>
