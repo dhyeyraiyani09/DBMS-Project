@@ -28,19 +28,21 @@ PASS
 
 ## 3. Five End-to-End Cases
 
-All cases successfully tested against actual seeded `users` and `orders` tables utilizing `fastapi.testclient`.
+All cases successfully tested against a controlled demonstration state (where specific indexes like `idx_orders_user_date` were intentionally omitted from the schema metadata to demonstrate genuine recommendation behavior).
 
 | Case | SQL | Analysis | Recommendation | EXPLAIN | History | Report |
 |---|---|---|---|---|---|---|
-| CASE 1 (PK) | `SELECT * FROM users WHERE id = 3;` | 1 Table, 1 Condition | 0 Candidates (Existing: -100) | 1 Row, Type: const, Key: PRIMARY | PASS | PASS |
-| CASE 2 (Range) | `SELECT * FROM users WHERE age > 25;` | 1 Table, 1 Condition | 0 Candidates (Existing: -100) | 1 Row, Type: range, Key: idx_users_age | PASS | PASS |
-| CASE 3 (Composite) | `SELECT * FROM orders WHERE user_id = 1 ORDER BY order_date DESC;` | 1 Table, 1 Condition | 0 Candidates (Existing: -100) | 1 Row, Type: ref, Key: idx_orders_user_date | PASS | PASS |
-| CASE 4 (JOIN) | `SELECT u.name, o.order_date FROM users u JOIN orders o ON u.id = o.user_id WHERE u.id = 1;` | 2 Tables, 1 Condition | 0 Candidates (Existing: -100) | 2 Rows, Type: const/ref | PASS | PASS |
-| CASE 5 (Low Sel) | `SELECT * FROM users WHERE is_active = TRUE;` | 1 Table, 1 Condition | 0 Candidates (Below Thr: -20) | 1 Row, Type: ALL | PASS | PASS |
+| CASE 1 (PK) | `SELECT * FROM users WHERE id = 3;` | 1 Table, 1 Cond | 0 Candidates (Existing: -100) | 1 Row, Type: const, Key: PRIMARY | PASS | PASS |
+| CASE 2 (Range) | `SELECT * FROM users WHERE age > 25;` | 1 Table, 1 Cond | 0 Candidates (Existing: -100) | 1 Row, Type: range, Key: idx_users_age | PASS | PASS |
+| CASE 3 (Composite) | `SELECT * FROM orders WHERE user_id = 1 ORDER BY order_date DESC;` | 1 Table, 1 Cond | 2 Candidates (orders(user_id, order_date) Score: 40 - RECOMMENDED) | 1 Row, Type: ref, Key: idx_orders_user_date | PASS | PASS |
+| CASE 4 (JOIN) | `SELECT u.name, o.order_date FROM users u JOIN orders o ON u.id = o.user_id WHERE u.id = 1;` | 2 Tables, 1 Cond | 0 Candidates (Existing: -100) | 2 Rows, Type: const/ref | PASS | PASS |
+| CASE 5 (Low Sel) | `SELECT * FROM users WHERE is_active = TRUE;` | 1 Table, 1 Cond | 0 Candidates (Below Thr: -20) | 1 Row, Type: ALL | PASS | PASS |
+
+Note for CASE 3: The engine correctly produced a NEW recommendation for `orders(user_id, order_date)` with factors: WHERE_EQUALITY (30), ORDER_BY (20), MAINTENANCE_COST (-10). (The MySQL physical EXPLAIN still safely utilized the existing disk index.)
 
 ## 4. Security Audit
 
-PASS. Evaluated AST isolation within `explain_analyzer.py:63` mapping directly to `conn.execute()`. No `exec` or `eval` functions are present. No Git credential tracking was observed (`git ls-files`).
+PASS. Evaluated AST isolation within `explain_analyzer.py:63`. The safety mechanism relies on AST validation + single-statement validation + SELECT-only validation + EXPLAIN wrapping directly to `conn.execute(explain_sql)`. No `exec`, `eval`, or shell functions are present. No Git credential tracking was observed (`git ls-files`).
 
 ## 5. Documentation Audit
 
@@ -60,7 +62,7 @@ NOT VERIFIED. E2E browser automation (Puppeteer/Cypress) is unavailable. The app
 
 ## 9. Performance
 
-Actual query execution performance (measured in ms) is intended to be un-instrumented to prevent runtime locks. Latency tests on typical DB parsing and `sqlglot` resolution completed cleanly under the 2-second goal threshold.
+Performance: Limited API/build measurements were performed during verification. Comprehensive benchmarking of all normal operations against the <2-second target was not performed. Actual SQL execution timing is not implemented.
 
 ## 10. Issues Found
 
