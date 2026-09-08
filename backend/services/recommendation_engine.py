@@ -285,16 +285,16 @@ class RecommendationEngine:
                     
                 # If PK is a left prefix of candidate
                 if len(cols) > len(pks) and cols[:len(pks)] == pks:
-                    self._add_factor(table, cols, "COVERED_BY_PK", PENALTY_REDUNDANT, "Candidate is partially covered by Primary Key prefix.")
+                    self._add_factor(table, cols, "REDUNDANT_PREFIX", PENALTY_REDUNDANT, "Candidate is partially covered by Primary Key prefix.")
                 
                 # If candidate is a left prefix of PK
                 if len(pks) > len(cols) and pks[:len(cols)] == cols:
-                    self._add_factor(table, cols, "EXISTING_PK", PENALTY_EXACT_EXISTING, "Candidate is fully covered by the Primary Key.")
+                    self._add_factor(table, cols, "COVERED_BY_PK", PENALTY_REDUNDANT, "Candidate is fully covered by the Primary Key.")
                     cand["status"] = "REDUNDANT"
                     cand["existing_index_conflict"] = True
                     continue
 
-            # Check other indexes
+            # Check other indexes for exact matches first
             for idx in table_def["indexes"]:
                 idx_cols = idx["columns"]
                 if not idx_cols:
@@ -305,10 +305,19 @@ class RecommendationEngine:
                     cand["status"] = "EXISTING"
                     cand["existing_index_conflict"] = True
                     break
+            
+            if cand["existing_index_conflict"]:
+                continue
+                
+            # If no exact match, check for redundant prefixes
+            for idx in table_def["indexes"]:
+                idx_cols = idx["columns"]
+                if not idx_cols:
+                    continue
                     
                 # If candidate is a left prefix of an existing index
                 if len(idx_cols) > len(cols) and idx_cols[:len(cols)] == cols:
-                    self._add_factor(table, cols, "COVERED_BY_INDEX", PENALTY_EXACT_EXISTING, f"Candidate is fully covered by the prefix of existing index '{idx['name']}'.")
+                    self._add_factor(table, cols, "COVERED_BY_INDEX", PENALTY_REDUNDANT, f"Candidate is fully covered by the prefix of existing index '{idx['name']}'.")
                     cand["status"] = "REDUNDANT"
                     cand["existing_index_conflict"] = True
                     break
