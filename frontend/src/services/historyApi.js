@@ -1,7 +1,7 @@
 import { API_URL } from './schemaApi';
 
 export const saveHistory = async (historyData) => {
-    const response = await fetch(`${API_URL}/api/history/`, {
+    const response = await fetch(`${API_URL}/history/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(historyData)
@@ -13,7 +13,7 @@ export const saveHistory = async (historyData) => {
 };
 
 export const listHistory = async () => {
-    const response = await fetch(`${API_URL}/api/history/`);
+    const response = await fetch(`${API_URL}/history/`);
     if (!response.ok) {
         throw new Error('Failed to fetch history list');
     }
@@ -21,7 +21,7 @@ export const listHistory = async () => {
 };
 
 export const getHistory = async (id) => {
-    const response = await fetch(`${API_URL}/api/history/${id}`);
+    const response = await fetch(`${API_URL}/history/${id}`);
     if (!response.ok) {
         throw new Error('Failed to fetch history details');
     }
@@ -29,7 +29,7 @@ export const getHistory = async (id) => {
 };
 
 export const deleteHistory = async (id) => {
-    const response = await fetch(`${API_URL}/api/history/${id}`, {
+    const response = await fetch(`${API_URL}/history/${id}`, {
         method: 'DELETE'
     });
     if (!response.ok) {
@@ -39,5 +39,5 @@ export const deleteHistory = async (id) => {
 };
 
 export const getReportUrl = (id, format) => {
-    return `${API_URL}/api/history/${id}/report?format=${format}`;
+    return `${API_URL}/history/${id}/report?format=${format}`;
 };
