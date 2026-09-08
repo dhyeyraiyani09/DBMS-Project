@@ -108,6 +108,29 @@ def create_index(table_id: int, index: schemas.IndexCreate, db: Session = Depend
     if not index.columns:
         raise HTTPException(status_code=400, detail="Index must have at least one column.")
 
+    # Validate sequence
+    seqs = sorted([col.seq_in_index for col in index.columns])
+    if seqs[0] < 1:
+        raise HTTPException(status_code=400, detail="seq_in_index must be a positive integer starting at 1.")
+    
+    expected_seq = list(range(1, len(seqs) + 1))
+    if seqs != expected_seq:
+        if len(set(seqs)) != len(seqs):
+            raise HTTPException(status_code=400, detail="Duplicate seq_in_index values are not allowed.")
+        raise HTTPException(status_code=400, detail="seq_in_index must be a contiguous sequence starting from 1.")
+
+    # Validate all columns belong to the table BEFORE committing anything
+    column_ids = [col.column_id for col in index.columns]
+    valid_cols = db.query(models.ColumnDef.id).filter(
+        models.ColumnDef.id.in_(column_ids),
+        models.ColumnDef.table_id == table_id
+    ).all()
+    valid_col_ids = set(c[0] for c in valid_cols)
+    
+    for col_id in column_ids:
+        if col_id not in valid_col_ids:
+            raise HTTPException(status_code=400, detail=f"Column ID {col_id} does not exist in the specified table.")
+
     db_index = models.IndexDef(
         table_id=table_id,
         name=index.name,
@@ -117,16 +140,10 @@ def create_index(table_id: int, index: schemas.IndexCreate, db: Session = Depend
     
     try:
         db.add(db_index)
-        db.commit()
-        db.refresh(db_index)
+        db.flush() # Flush to get db_index.id without committing
         
         # Add index columns
         for idx_col in index.columns:
-            # Verify column exists
-            col = db.query(models.ColumnDef).filter(models.ColumnDef.id == idx_col.column_id, models.ColumnDef.table_id == table_id).first()
-            if not col:
-                raise ValueError(f"Column ID {idx_col.column_id} does not exist in table.")
-                
             db_idx_col = models.IndexColumnDef(
                 index_id=db_index.id,
                 column_id=idx_col.column_id,
@@ -137,9 +154,9 @@ def create_index(table_id: int, index: schemas.IndexCreate, db: Session = Depend
         db.commit()
         db.refresh(db_index)
         return db_index
-    except ValueError as ve:
-        db.rollback()
-        raise HTTPException(status_code=400, detail=str(ve))
     except IntegrityError:
         db.rollback()
-        raise HTTPException(status_code=400, detail=f"Invalid index data. Name might be duplicate.")
+        raise HTTPException(status_code=400, detail="Invalid index data. Name might be duplicate.")
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(e))

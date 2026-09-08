@@ -107,3 +107,108 @@ def test_create_index_preserves_order():
     assert data["index_columns"][0]["seq_in_index"] == 1
     assert data["index_columns"][1]["column_id"] == c2['id']
     assert data["index_columns"][1]["seq_in_index"] == 2
+
+def test_create_single_column_index():
+    sch = client.post("/api/schemas/", json={"name": "db_single_idx"}).json()
+    t1 = client.post(f"/api/schemas/{sch['id']}/tables", json={"name": "users"}).json()
+    c1 = client.post(f"/api/schemas/tables/{t1['id']}/columns", json={"name": "email", "data_type": "VARCHAR"}).json()
+
+    response = client.post(f"/api/schemas/tables/{t1['id']}/indexes", json={
+        "name": "idx_email",
+        "columns": [{"column_id": c1['id'], "seq_in_index": 1}]
+    })
+    assert response.status_code == 201
+    data = response.json()
+    assert data["name"] == "idx_email"
+    assert len(data["index_columns"]) == 1
+
+def test_invalid_column_id():
+    sch = client.post("/api/schemas/", json={"name": "db_inv_col"}).json()
+    t1 = client.post(f"/api/schemas/{sch['id']}/tables", json={"name": "users"}).json()
+
+    response = client.post(f"/api/schemas/tables/{t1['id']}/indexes", json={
+        "name": "idx_bad_col",
+        "columns": [{"column_id": 9999, "seq_in_index": 1}]
+    })
+    assert response.status_code == 400
+
+    # Ensure IndexDef was not left behind
+    sch_data = client.get(f"/api/schemas/{sch['id']}").json()
+    assert len(sch_data["tables"][0]["indexes"]) == 0
+
+def test_duplicate_seq_in_index():
+    sch = client.post("/api/schemas/", json={"name": "db_dup_seq"}).json()
+    t1 = client.post(f"/api/schemas/{sch['id']}/tables", json={"name": "users"}).json()
+    c1 = client.post(f"/api/schemas/tables/{t1['id']}/columns", json={"name": "first_name", "data_type": "VARCHAR"}).json()
+    c2 = client.post(f"/api/schemas/tables/{t1['id']}/columns", json={"name": "last_name", "data_type": "VARCHAR"}).json()
+
+    response = client.post(f"/api/schemas/tables/{t1['id']}/indexes", json={
+        "name": "idx_name",
+        "columns": [
+            {"column_id": c1['id'], "seq_in_index": 1},
+            {"column_id": c2['id'], "seq_in_index": 1}
+        ]
+    })
+    assert response.status_code == 400
+    assert "Duplicate" in response.json()["detail"]
+
+def test_seq_in_index_starting_at_zero():
+    sch = client.post("/api/schemas/", json={"name": "db_zero_seq"}).json()
+    t1 = client.post(f"/api/schemas/{sch['id']}/tables", json={"name": "users"}).json()
+    c1 = client.post(f"/api/schemas/tables/{t1['id']}/columns", json={"name": "email", "data_type": "VARCHAR"}).json()
+
+    response = client.post(f"/api/schemas/tables/{t1['id']}/indexes", json={
+        "name": "idx_email_zero",
+        "columns": [{"column_id": c1['id'], "seq_in_index": 0}]
+    })
+    assert response.status_code == 400
+    assert "positive integer" in response.json()["detail"]
+
+def test_non_contiguous_seq_in_index():
+    sch = client.post("/api/schemas/", json={"name": "db_gap_seq"}).json()
+    t1 = client.post(f"/api/schemas/{sch['id']}/tables", json={"name": "users"}).json()
+    c1 = client.post(f"/api/schemas/tables/{t1['id']}/columns", json={"name": "first_name", "data_type": "VARCHAR"}).json()
+    c2 = client.post(f"/api/schemas/tables/{t1['id']}/columns", json={"name": "last_name", "data_type": "VARCHAR"}).json()
+
+    response = client.post(f"/api/schemas/tables/{t1['id']}/indexes", json={
+        "name": "idx_name_gap",
+        "columns": [
+            {"column_id": c1['id'], "seq_in_index": 1},
+            {"column_id": c2['id'], "seq_in_index": 3}
+        ]
+    })
+    assert response.status_code == 400
+    assert "contiguous" in response.json()["detail"]
+
+def test_column_belongs_to_another_table():
+    sch = client.post("/api/schemas/", json={"name": "db_wrong_tbl"}).json()
+    t1 = client.post(f"/api/schemas/{sch['id']}/tables", json={"name": "users"}).json()
+    c1 = client.post(f"/api/schemas/tables/{t1['id']}/columns", json={"name": "email", "data_type": "VARCHAR"}).json()
+
+    t2 = client.post(f"/api/schemas/{sch['id']}/tables", json={"name": "orders"}).json()
+
+    response = client.post(f"/api/schemas/tables/{t2['id']}/indexes", json={
+        "name": "idx_bad_tbl",
+        "columns": [{"column_id": c1['id'], "seq_in_index": 1}]
+    })
+    assert response.status_code == 400
+    assert "does not exist in the specified table" in response.json()["detail"]
+
+def test_duplicate_index_name():
+    sch = client.post("/api/schemas/", json={"name": "db_dup_idx"}).json()
+    t1 = client.post(f"/api/schemas/{sch['id']}/tables", json={"name": "users"}).json()
+    c1 = client.post(f"/api/schemas/tables/{t1['id']}/columns", json={"name": "email", "data_type": "VARCHAR"}).json()
+
+    # Create first index
+    client.post(f"/api/schemas/tables/{t1['id']}/indexes", json={
+        "name": "idx_email",
+        "columns": [{"column_id": c1['id'], "seq_in_index": 1}]
+    })
+
+    # Try creating second index with same name
+    response = client.post(f"/api/schemas/tables/{t1['id']}/indexes", json={
+        "name": "idx_email",
+        "columns": [{"column_id": c1['id'], "seq_in_index": 1}]
+    })
+    assert response.status_code == 400
+    assert "duplicate" in response.json()["detail"].lower()
