@@ -68,3 +68,44 @@ def test_explain_api_valid_query():
     assert "possible_keys" in row
     assert "key" in row
     assert "Extra" in row
+
+def test_explain_analyzer_quoted_semicolon():
+    # Should not raise exception
+    analyzer = ExplainAnalyzer("SELECT * FROM users WHERE name = 'Alice; DROP TABLE users;'")
+    analyzer._validate_safe_select()
+
+def test_explain_api_missing_data():
+    response = client.post("/api/explain/", json={})
+    assert response.status_code == 422 # FastAPI validation error
+
+def test_explain_access_type_interpretation():
+    analyzer = ExplainAnalyzer("SELECT * FROM users")
+    assert "entire table" in analyzer._interpret_access_type("ALL")
+    assert "single-row lookup" in analyzer._interpret_access_type("const")
+    assert "non-unique/reference" in analyzer._interpret_access_type("ref")
+    assert "index range scan" in analyzer._interpret_access_type("range")
+    assert "entire index tree" in analyzer._interpret_access_type("index")
+    assert "one matching row per preceding row" in analyzer._interpret_access_type("eq_ref")
+
+def test_explain_api_mysql_error():
+    # Force a MySQL error by querying a non-existent table (assuming 'fake_table' doesn't exist)
+    response = client.post("/api/explain/", json={"query": "SELECT * FROM fake_table"})
+    assert response.status_code == 400
+    assert "EXPLAIN execution failed" in response.json()["detail"]
+
+def test_explain_api_fields_and_distinction():
+    response = client.post("/api/explain/", json={"query": "SELECT * FROM orders WHERE user_id = 1"})
+    assert response.status_code == 200
+    data = response.json()
+    row = data["explain_rows"][0]
+    
+    # Verify all normalized fields exist
+    fields = ["id", "select_type", "table", "type", "possible_keys", "key", "key_len", "ref", "rows", "filtered", "Extra", "interpretation"]
+    for f in fields:
+        assert f in row
+        
+    # verify possible_keys/key distinction educational explanation
+    # (The test verifies the fields exist; the educational distinction is verified in UI/documentation)
+    assert row["possible_keys"] is not None # idx_user_date, idx_user
+    assert row["key"] is not None # probably idx_user_date or idx_user
+

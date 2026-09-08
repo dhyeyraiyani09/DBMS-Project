@@ -36,17 +36,17 @@ class ExplainAnalyzer:
         
         at = access_type.lower()
         if at == "all":
-            return "MySQL is scanning the entire table. This can become very expensive as table size increases."
+            return "MySQL is scanning the entire table (full table scan). This can become very expensive as table size increases."
         elif at == "index":
-            return "MySQL is scanning the entire index tree. Slightly faster than ALL, but still expensive."
+            return "MySQL is scanning the entire index tree (full index scan). Slightly faster than ALL, but still expensive."
         elif at == "range":
-            return "MySQL is using an index range lookup. Commonly associated with range predicates (>, <, BETWEEN)."
+            return "MySQL is using an index range scan. Commonly associated with range predicates (>, <, BETWEEN)."
         elif at == "ref":
-            return "MySQL is using a non-unique index to find rows. Very efficient."
+            return "MySQL is doing an indexed lookup using a non-unique/reference value. Very efficient."
         elif at == "eq_ref":
-            return "MySQL is using a PRIMARY KEY or UNIQUE index, finding exactly one row. Extremely efficient."
+            return "MySQL is doing an indexed lookup finding one matching row per preceding row in a join (using a PRIMARY KEY or UNIQUE index). Extremely efficient."
         elif at == "const" or at == "system":
-            return "MySQL treats this table as having only one row. Lightning fast."
+            return "MySQL is doing a very selective single-row lookup. Lightning fast."
         return f"MySQL access type: {access_type}."
 
     def execute_explain(self) -> Dict[str, Any]:

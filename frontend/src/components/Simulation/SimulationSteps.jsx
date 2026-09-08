@@ -350,6 +350,11 @@ export const StepExplainPlan = ({ explainData, explainError }) => {
                             </tbody>
                         </table>
                         
+                        <div className="educational-note" style={{marginTop: '1rem', background: 'var(--bg-secondary)', borderLeft: '4px solid var(--accent)'}}>
+                            <strong>possible_keys:</strong> Indexes MySQL could potentially use.<br/>
+                            <strong>key:</strong> The index MySQL actually selected for the plan.
+                        </div>
+                        
                         <h5 style={{marginTop: '2rem'}}>Plan Interpretation</h5>
                         <div className="operations-grid">
                             {explainData.explain_rows.map((row, i) => (
