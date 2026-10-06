@@ -9,11 +9,11 @@ client = TestClient(app)
 def test_explain_analyzer_validation():
     # Valid SELECT
     analyzer = ExplainAnalyzer("SELECT * FROM users WHERE age > 25")
-    analyzer._validate_safe_select() # Should not raise
+    analyzer._validate_and_translate() # Should not raise
     
     # Valid Nested SELECT
     analyzer = ExplainAnalyzer("SELECT * FROM users WHERE id IN (SELECT user_id FROM orders)")
-    analyzer._validate_safe_select()
+    analyzer._validate_and_translate()
     
     # Invalid destructive commands
     invalid_queries = [
@@ -31,16 +31,16 @@ def test_explain_analyzer_validation():
     
     for q in invalid_queries:
         with pytest.raises(ExplainError) as excinfo:
-            ExplainAnalyzer(q)._validate_safe_select()
+            ExplainAnalyzer(q)._validate_and_translate()
         assert "Only SELECT queries are allowed" in str(excinfo.value)
         
     # Multi-statement / Injection
     with pytest.raises(ExplainError):
-        ExplainAnalyzer("SELECT * FROM users; DROP TABLE users;")._validate_safe_select()
+        ExplainAnalyzer("SELECT * FROM users; DROP TABLE users;")._validate_and_translate()
         
     # Comments bypass test
     with pytest.raises(ExplainError):
-        ExplainAnalyzer("SELECT * FROM users /* comment */; DROP TABLE users;")._validate_safe_select()
+        ExplainAnalyzer("SELECT * FROM users /* comment */; DROP TABLE users;")._validate_and_translate()
 
 def test_explain_api_empty_query():
     response = client.post("/api/explain/", json={"query": ""})
@@ -72,7 +72,7 @@ def test_explain_api_valid_query():
 def test_explain_analyzer_quoted_semicolon():
     # Should not raise exception
     analyzer = ExplainAnalyzer("SELECT * FROM users WHERE name = 'Alice; DROP TABLE users;'")
-    analyzer._validate_safe_select()
+    analyzer._validate_and_translate()
 
 def test_explain_api_missing_data():
     response = client.post("/api/explain/", json={})

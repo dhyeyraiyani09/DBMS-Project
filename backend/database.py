@@ -15,7 +15,14 @@ else:
 # We disable check_same_thread for sqlite, but we use mysql here. 
 # We'll allow the engine to be swapped out for testing.
 try:
-    engine = create_engine(DATABASE_URL, pool_pre_ping=True, pool_recycle=3600)
+    connect_args = {}
+    if config.DB_SSL_CA:
+        connect_args["ssl"] = {
+            "ca": config.DB_SSL_CA,
+            "check_hostname": True
+        }
+    
+    engine = create_engine(DATABASE_URL, pool_pre_ping=True, pool_recycle=3600, connect_args=connect_args)
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 except Exception as e:
     logger.error(f"Failed to create engine: {e}")

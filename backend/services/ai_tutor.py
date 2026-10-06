@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 class AITutorService:
     def __init__(self):
         self.api_key = os.getenv("GEMINI_API_KEY")
-        self.endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent"
+        self.endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent"
         
     async def process_request(self, request_data: Dict[str, Any]) -> Dict[str, Any]:
         action = request_data.get("action")

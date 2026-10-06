@@ -1,6 +1,6 @@
 import { API_URL } from './schemaApi'; // Or define it again
 
-const BASE_URL = 'http://127.0.0.1:8000/api';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api';
 
 export const analyzeQuery = async (query, schemaId = null) => {
     const res = await fetch(`${BASE_URL}/queries/analyze`, {

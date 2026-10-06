@@ -37,7 +37,7 @@ def cleanup():
 
 def test_create_schema():
     response = client.post("/api/schemas/", json={"name": "ecommerce", "description": "Shop DB"})
-    assert response.status_code == 201
+    assert response.status_code == 201, response.text
     assert response.json()["name"] == "ecommerce"
 
 def test_create_duplicate_schema():
@@ -49,18 +49,20 @@ def test_create_duplicate_schema():
 def test_create_table():
     sch = client.post("/api/schemas/", json={"name": "db1"}).json()
     response = client.post(f"/api/schemas/{sch['id']}/tables", json={"name": "users"})
-    assert response.status_code == 201
+    assert response.status_code == 201, response.text
     assert response.json()["name"] == "users"
 
 def test_create_column():
     sch = client.post("/api/schemas/", json={"name": "db2"}).json()
-    tbl = client.post(f"/api/schemas/{sch['id']}/tables", json={"name": "products"}).json()
+    tbl_res = client.post(f"/api/schemas/{sch['id']}/tables", json={"name": "products"})
+    assert tbl_res.status_code == 201, tbl_res.text
+    tbl = tbl_res.json()
     response = client.post(f"/api/schemas/tables/{tbl['id']}/columns", json={
         "name": "price",
         "data_type": "DECIMAL",
         "nullable": False
     })
-    assert response.status_code == 201
+    assert response.status_code == 201, response.text
     assert response.json()["name"] == "price"
 
 def test_create_foreign_key():
@@ -80,7 +82,7 @@ def test_create_foreign_key():
         "ref_table_id": t_users['id'],
         "ref_column_id": c_users_id['id']
     })
-    assert response.status_code == 201
+    assert response.status_code == 201, response.text
     assert response.json()["column_id"] == c_orders_uid['id']
 
 def test_create_index_preserves_order():
@@ -98,7 +100,7 @@ def test_create_index_preserves_order():
             {"column_id": c2['id'], "seq_in_index": 2}
         ]
     })
-    assert response.status_code == 201
+    assert response.status_code == 201, response.text
     data = response.json()
     assert data["name"] == "idx_logs_user_date"
     assert len(data["index_columns"]) == 2
@@ -117,7 +119,7 @@ def test_create_single_column_index():
         "name": "idx_email",
         "columns": [{"column_id": c1['id'], "seq_in_index": 1}]
     })
-    assert response.status_code == 201
+    assert response.status_code == 201, response.text
     data = response.json()
     assert data["name"] == "idx_email"
     assert len(data["index_columns"]) == 1
