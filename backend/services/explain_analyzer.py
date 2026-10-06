@@ -3,7 +3,8 @@ import logging
 from sqlalchemy import text
 from sqlglot import exp
 from backend.services.sql_parser import parse_sql, SQLParseError
-from backend.database import engine
+from backend.database import engine, SessionLocal
+from backend.models import TableDef
 
 logger = logging.getLogger(__name__)
 
@@ -11,21 +12,55 @@ class ExplainError(Exception):
     pass
 
 class ExplainAnalyzer:
-    def __init__(self, query: str):
+    def __init__(self, query: str, schema_id: int = None):
         self.query = query
+        self.schema_id = schema_id
+        self.ast = None
 
-    def _validate_safe_select(self):
+    def _validate_and_translate(self) -> str:
         """
-        Ensures the query is a safe SELECT statement to prevent destructive EXPLAIN execution.
+        Ensures the query is a safe SELECT statement and translates logical table names
+        to physical table names using the schema_id.
         """
         try:
-            ast = parse_sql(self.query)
+            self.ast = parse_sql(self.query)
         except SQLParseError as e:
             raise ExplainError(str(e))
             
         # Check if the root node is a SELECT expression
-        if not isinstance(ast, exp.Select):
+        if not isinstance(self.ast, exp.Select):
             raise ExplainError("Only SELECT queries are allowed for EXPLAIN analysis. Destructive commands (INSERT, UPDATE, DELETE, CREATE, DROP, etc.) are prohibited.")
+
+        if self.schema_id is None:
+            return self.query
+            
+        db = SessionLocal()
+        try:
+            # Fetch all tables for this schema
+            tables = db.query(TableDef).filter(TableDef.schema_id == self.schema_id).all()
+            # Map lowercase logical name to physical name
+            table_map = {t.name.lower(): f"phy_{self.schema_id}_{t.id}" for t in tables}
+            
+            # Identify CTEs (Common Table Expressions) so we don't try to map them to physical tables
+            cte_names = set()
+            for with_ in self.ast.find_all(exp.With):
+                for cte in with_.expressions:
+                    cte_names.add(cte.alias.lower())
+
+            def replace_table(node):
+                if isinstance(node, exp.Table):
+                    tname = node.name.lower()
+                    if tname in table_map and tname not in cte_names:
+                        node.set("this", exp.Identifier(this=table_map[tname]))
+                return node
+                
+            translated_ast = self.ast.copy().transform(replace_table)
+            return translated_ast.sql(dialect="mysql")
+        except Exception as e:
+            logger.error(f"Error translating query: {e}")
+            raise ExplainError(f"Error translating query: {str(e)}")
+        finally:
+            db.close()
 
     def _interpret_access_type(self, access_type: str) -> str:
         """
@@ -53,14 +88,13 @@ class ExplainAnalyzer:
         """
         Executes EXPLAIN and normalizes the output.
         """
-        self._validate_safe_select()
+        translated_query = self._validate_and_translate()
         
         if engine is None:
             raise ExplainError("Database connection is not configured or MySQL is unavailable.")
         
-        # We explicitly concatenate EXPLAIN with the validated query string. 
-        # We know it's a single SELECT statement thanks to parse_sql and validation above.
-        explain_sql = text(f"EXPLAIN FORMAT=TRADITIONAL {self.query}")
+        # We explicitly concatenate EXPLAIN with the validated query string.
+        explain_sql = text(f"EXPLAIN FORMAT=TRADITIONAL {translated_query}")
         
         try:
             with engine.connect() as conn:
@@ -74,14 +108,32 @@ class ExplainAnalyzer:
                     access_type = r_dict.get("type")
                     interpretation = self._interpret_access_type(access_type) if access_type else ""
                     
-                    # Some MySQL versions return different casing
                     possible_keys = r_dict.get("possible_keys") or r_dict.get("Possible_keys")
                     key = r_dict.get("key") or r_dict.get("Key")
                     
+                    # We need to map physical table names back to logical table names for the UI
+                    # But if we don't have schema_id, we can't. Wait, the physical table name is 'phy_X_Y'.
+                    table_name = r_dict.get("table")
+                    
+                    # Actually, SQLGlot preserves table aliases if we provided them, e.g. `users AS u`.
+                    # In that case, EXPLAIN returns `u` for the table name.
+                    # If there's no alias, it returns the physical table name `phy_1_2`.
+                    # Let's map it back to logical name if it matches phy_schemaId_tableId pattern.
+                    if table_name and self.schema_id and table_name.startswith(f"phy_{self.schema_id}_"):
+                        try:
+                            t_id = int(table_name.split("_")[-1])
+                            db = SessionLocal()
+                            t_def = db.query(TableDef).filter(TableDef.id == t_id).first()
+                            if t_def:
+                                table_name = t_def.name
+                            db.close()
+                        except:
+                            pass
+                            
                     normalized_rows.append({
                         "id": r_dict.get("id"),
                         "select_type": r_dict.get("select_type"),
-                        "table": r_dict.get("table"),
+                        "table": table_name,
                         "type": access_type,
                         "possible_keys": possible_keys,
                         "key": key,

@@ -178,6 +178,7 @@ class RecommendationResponse(BaseModel):
 # --- Explain Engine ---
 class ExplainRequest(BaseModel):
     query: str
+    schema_id: Optional[int] = None
 
 class ExplainRow(BaseModel):
     id: Optional[Any] = None

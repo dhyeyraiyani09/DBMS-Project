@@ -72,7 +72,7 @@ function QueryAnalyzer() {
             setSchemaData(fullSchema);
 
             try {
-                const expData = await explainQuery(query);
+                const expData = await explainQuery(query, schemaId);
                 setExplainData(expData);
             } catch (expErr) {
                 setExplainError(expErr.message);

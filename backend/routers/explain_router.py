@@ -20,7 +20,7 @@ def explain_query(request: ExplainRequest):
         raise HTTPException(status_code=400, detail="SQL query cannot be empty.")
     
     try:
-        analyzer = ExplainAnalyzer(request.query)
+        analyzer = ExplainAnalyzer(request.query, request.schema_id)
         result = analyzer.execute_explain()
         return result
     except ExplainError as e:
