@@ -12,15 +12,24 @@ if config.DB_PASSWORD:
 else:
     DATABASE_URL = f"mysql+pymysql://{config.DB_USER}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}"
 
+import ssl
+
 # We disable check_same_thread for sqlite, but we use mysql here. 
 # We'll allow the engine to be swapped out for testing.
 try:
     connect_args = {}
     if config.DB_SSL_CA:
-        connect_args["ssl"] = {
-            "ca": config.DB_SSL_CA,
-            "check_hostname": True
-        }
+        ssl_context = ssl.create_default_context()
+        ssl_context.check_hostname = True
+        ssl_context.verify_mode = ssl.CERT_REQUIRED
+        
+        # Load from PEM string provided in environment
+        # Note: replace literal '\n' with actual newlines if necessary, 
+        # but typically env vars preserve newlines.
+        cadata = config.DB_SSL_CA.replace('\\n', '\n')
+        ssl_context.load_verify_locations(cadata=cadata)
+        
+        connect_args["ssl"] = ssl_context
     
     engine = create_engine(DATABASE_URL, pool_pre_ping=True, pool_recycle=3600, connect_args=connect_args)
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

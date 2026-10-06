@@ -10,7 +10,7 @@ class Config:
     DB_USER = os.getenv("DB_USER", "root")
     DB_PASSWORD = os.getenv("DB_PASSWORD", "")
     DB_NAME = os.getenv("DB_NAME", "index_recommendation_engine")
-    # Expected to be a CA certificate file path (e.g. /etc/secrets/ca.pem in Render)
+    # Expected to be the raw CA certificate PEM string (e.g., for Vercel deployment)
     DB_SSL_CA = os.getenv("DB_SSL_CA", "")
     FRONTEND_URL = os.getenv("FRONTEND_URL", "")
     
