@@ -12,11 +12,42 @@ router = APIRouter(prefix="/api/schemas", tags=["Schemas"])
 def safe_quote(name: str) -> str:
     return f"`{name.replace('`', '').replace(';', '')}`"
 
-def safe_type(dtype: str) -> str:
-    # only allow safe characters for data types like VARCHAR(255), INT, etc.
-    if not re.match(r"^[A-Za-z0-9\s\(\)\,]+$", dtype):
-        raise HTTPException(400, "Invalid data type format")
-    return dtype
+# Centralized whitelist map: logical type name → safe MySQL DDL type
+# Keys are uppercase; values are exact MySQL column-type strings.
+_MYSQL_TYPE_MAP: dict = {
+    "INT":      "INT",
+    "BIGINT":   "BIGINT",
+    "BOOLEAN":  "BOOLEAN",
+    "DATE":     "DATE",
+    "DATETIME": "DATETIME",
+    "TEXT":     "TEXT",
+    "VARCHAR":  "VARCHAR(255)",   # bare VARCHAR needs a length in MySQL
+    "DECIMAL":  "DECIMAL(10,2)",  # bare DECIMAL needs precision/scale
+    "FLOAT":    "FLOAT",
+    "DOUBLE":   "DOUBLE",
+}
+
+def normalize_mysql_type(dtype: str) -> str:
+    """
+    Convert a logical data_type value to a safe, syntactically-valid MySQL
+    column-type string using the whitelist above.
+
+    Accepts bare keywords ("VARCHAR") or already-specified types ("VARCHAR(255)")
+    by normalising to the base keyword first.
+
+    Raises HTTP 400 for unsupported or malformed types.
+    """
+    if not dtype or not isinstance(dtype, str):
+        raise HTTPException(400, "data_type must be a non-empty string.")
+
+    base = dtype.strip().upper().split("(")[0].strip()
+    if base not in _MYSQL_TYPE_MAP:
+        raise HTTPException(
+            400,
+            f"Unsupported data type '{dtype}'. "
+            f"Allowed types: {', '.join(sorted(_MYSQL_TYPE_MAP))}."
+        )
+    return _MYSQL_TYPE_MAP[base]
 
 @router.get("/", response_model=List[schemas.SchemaResponse])
 def get_schemas(db: Session = Depends(get_db)):
@@ -103,7 +134,7 @@ def create_column(table_id: int, column: schemas.ColumnCreate, db: Session = Dep
         physical_name = f"phy_{schema_id}_{table_id}"
         
         col_name = safe_quote(column.name)
-        dtype = safe_type(column.data_type)
+        dtype = normalize_mysql_type(column.data_type)
         
         # Build ALTER TABLE
         ddl = f"ALTER TABLE {physical_name} ADD COLUMN {col_name} {dtype}"
