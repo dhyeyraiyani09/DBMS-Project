@@ -117,3 +117,30 @@ def test_ai_tutor_why_not_missing_fallback():
     data = res.json()
     tutor_service.api_key = original_key
     assert "not present in the available deterministic candidate analysis" in data["answer"]
+
+def test_ai_tutor_api_failure_fallback():
+    from backend.routers.ai_router import tutor_service
+    import httpx
+    
+    # Force API key to be present so it attempts the request
+    original_key = tutor_service.api_key
+    tutor_service.api_key = "FAKE_KEY_FOR_TESTING"
+    
+    # Mock httpx.AsyncClient.post to raise an exception simulating network failure
+    with patch("httpx.AsyncClient.post", side_effect=httpx.ConnectError("Network is unreachable")):
+        payload = {
+            "action": "explain_recommendation",
+            "question": None,
+            "query_analysis": {},
+            "recommendation": {},
+            "explain": None,
+            "schema_metadata": None
+        }
+        res = client.post("/api/ai/tutor", json=payload)
+        assert res.status_code == 200
+        data = res.json()
+        assert data["success"] is True
+        assert data["provider"] == "fallback"
+        assert "AI unavailable" in data["answer"]
+        
+    tutor_service.api_key = original_key

@@ -1,7 +1,10 @@
 import os
 import json
 import httpx
+import logging
 from typing import Dict, Any
+
+logger = logging.getLogger(__name__)
 
 class AITutorService:
     def __init__(self):
@@ -54,10 +57,10 @@ class AITutorService:
                         "error": None
                     }
                 else:
-                    print(f"Gemini API Error: {response.status_code} - {response.text}")
+                    logger.warning(f"Gemini API Error: {response.status_code} - {response.text}")
                     return self._get_fallback_response(action, request_data)
         except Exception as e:
-            print(f"Gemini Network Error: {str(e)}")
+            logger.error(f"Gemini Network Error: {str(e)}")
             return self._get_fallback_response(action, request_data)
             
     def _build_prompt(self, request: Dict[str, Any]) -> str:
