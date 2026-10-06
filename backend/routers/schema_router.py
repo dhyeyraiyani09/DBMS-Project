@@ -103,10 +103,10 @@ def create_table(schema_id: int, table: schemas.TableCreate, db: Session = Depen
         
         # Physical table creation
         physical_name = f"phy_{schema_id}_{db_table.id}"
-        # Start with a dummy column (MySQL requires at least one column)
+        # Start with a dummy primary key column (MySQL requires a PK if sql_require_primary_key=ON)
         if db.get_bind().dialect.name != 'sqlite':
             db.execute(text(f"DROP TABLE IF EXISTS {physical_name}"))
-            db.execute(text(f"CREATE TABLE {physical_name} (_phy_dummy INT)"))
+            db.execute(text(f"CREATE TABLE {physical_name} (_phy_dummy INT PRIMARY KEY)"))
         
         db.commit()
         db.refresh(db_table)
@@ -138,10 +138,24 @@ def create_column(table_id: int, column: schemas.ColumnCreate, db: Session = Dep
         
         # Build ALTER TABLE
         ddl = f"ALTER TABLE {physical_name} ADD COLUMN {col_name} {dtype}"
-        if column.is_primary_key:
-            ddl += f", ADD PRIMARY KEY ({col_name})"
-            
+        
         if db.get_bind().dialect.name != 'sqlite':
+            if column.is_primary_key:
+                # If this is the first primary key being added, the dummy PK exists.
+                # Drop the dummy PK and promote this new column in one atomic step.
+                dummy_exists = False
+                try:
+                    res = db.execute(text(f"SHOW COLUMNS FROM {physical_name} LIKE '_phy_dummy'")).fetchone()
+                    if res:
+                        dummy_exists = True
+                except Exception:
+                    pass
+                
+                if dummy_exists:
+                    ddl += f", DROP PRIMARY KEY, ADD PRIMARY KEY ({col_name}), DROP COLUMN _phy_dummy"
+                else:
+                    ddl += f", ADD PRIMARY KEY ({col_name})"
+            
             db.execute(text(ddl))
         
         db.commit()
