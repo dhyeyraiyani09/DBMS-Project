@@ -1,3 +1,16 @@
+import sys
+import os
+
+# Fix for Vercel deployment: create a virtual 'backend' package
+# when Vercel sets the Root Directory to 'backend'.
+if "backend" not in sys.modules:
+    import types
+    backend_pkg = types.ModuleType("backend")
+    backend_pkg.__path__ = [os.path.dirname(os.path.abspath(__file__))]
+    backend_pkg.__package__ = "backend"
+    sys.modules["backend"] = backend_pkg
+    __package__ = "backend"
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .config import config
