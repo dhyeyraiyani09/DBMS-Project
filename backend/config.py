@@ -20,6 +20,9 @@ class Config:
         "http://localhost:3000",
         ]
     if FRONTEND_URL:
-        CORS_ORIGINS.append(FRONTEND_URL)
+        for url in FRONTEND_URL.split(","):
+            clean_url = url.strip().rstrip("/")
+            if clean_url:
+                CORS_ORIGINS.append(clean_url)
 
 config = Config()
