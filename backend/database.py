@@ -7,11 +7,11 @@ from .config import config
 
 logger = logging.getLogger(__name__)
 
-# Format: mysql+pymysql://user:password@host:port/database
+# Format: mysql+mysqlconnector://user:password@host:port/database
 if config.DB_PASSWORD:
-    DATABASE_URL = f"mysql+pymysql://{config.DB_USER}:{config.DB_PASSWORD}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}"
+    DATABASE_URL = f"mysql+mysqlconnector://{config.DB_USER}:{config.DB_PASSWORD}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}"
 else:
-    DATABASE_URL = f"mysql+pymysql://{config.DB_USER}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}"
+    DATABASE_URL = f"mysql+mysqlconnector://{config.DB_USER}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}"
 
 import ssl
 
@@ -26,9 +26,9 @@ try:
         with open(ca_path, "w") as f:
             f.write(cadata)
             
-        connect_args["ssl"] = {
-            "ca": ca_path,
-            "check_hostname": True
+        connect_args = {
+            "ssl_ca": ca_path,
+            "ssl_verify_cert": True
         }
     
     engine = create_engine(DATABASE_URL, poolclass=NullPool, connect_args=connect_args)
