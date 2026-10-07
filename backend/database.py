@@ -23,11 +23,14 @@ try:
         ssl_context.check_hostname = True
         ssl_context.verify_mode = ssl.CERT_REQUIRED
         
-        # Load from PEM string provided in environment
-        # Note: replace literal '\n' with actual newlines if necessary, 
-        # but typically env vars preserve newlines.
+        # Write the certificate to /tmp/ to avoid OpenSSL EBUSY errors in AWS Lambda
+        # when using cadata=... directly in memory.
+        ca_path = "/tmp/aiven_ca.pem"
         cadata = config.DB_SSL_CA.replace('\\n', '\n')
-        ssl_context.load_verify_locations(cadata=cadata)
+        with open(ca_path, "w") as f:
+            f.write(cadata)
+            
+        ssl_context.load_verify_locations(cafile=ca_path)
         
         connect_args["ssl"] = ssl_context
     
