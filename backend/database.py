@@ -20,20 +20,16 @@ import ssl
 try:
     connect_args = {}
     if config.DB_SSL_CA:
-        ssl_context = ssl.create_default_context()
-        ssl_context.check_hostname = True
-        ssl_context.verify_mode = ssl.CERT_REQUIRED
-        
         # Write the certificate to /tmp/ to avoid OpenSSL EBUSY errors in AWS Lambda
-        # when using cadata=... directly in memory.
         ca_path = "/tmp/aiven_ca.pem"
         cadata = config.DB_SSL_CA.replace('\\n', '\n')
         with open(ca_path, "w") as f:
             f.write(cadata)
             
-        ssl_context.load_verify_locations(cafile=ca_path)
-        
-        connect_args["ssl"] = ssl_context
+        connect_args["ssl"] = {
+            "ca": ca_path,
+            "check_hostname": True
+        }
     
     engine = create_engine(DATABASE_URL, poolclass=NullPool, connect_args=connect_args)
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
