@@ -5,13 +5,6 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.exc import OperationalError
 from .config import config
 
-# Vercel AWS Lambda IPv6 EBUSY fix: force socket to IPv4
-import socket
-orig_getaddrinfo = socket.getaddrinfo
-def getaddrinfo_ipv4(host, port, family=0, type=0, proto=0, flags=0):
-    return orig_getaddrinfo(host, port, socket.AF_INET, type, proto, flags)
-socket.getaddrinfo = getaddrinfo_ipv4
-
 logger = logging.getLogger(__name__)
 
 # Format: mysql+pymysql://user:password@host:port/database
