@@ -1,6 +1,8 @@
 import React from 'react';
 
 import dhyeyPhoto from '../assets/dhyey.jpg';
+import prashamPhoto from '../assets/prasham.jpg';
+import yashPhoto from '../assets/yash.jpg';
 
 const StudentCard = ({ name, regNo, photoUrl }) => (
     <div className="dev-student-card-v2">
@@ -53,6 +55,16 @@ export default function DevelopedByPage() {
                         name="Dhyey Deepak Raiyani" 
                         regNo="25BCE1339" 
                         photoUrl={dhyeyPhoto} 
+                    />
+                    <StudentCard 
+                        name="Prasham Girish Hodlur" 
+                        regNo="25BCE1515" 
+                        photoUrl={prashamPhoto} 
+                    />
+                    <StudentCard 
+                        name="Yash Sharma" 
+                        regNo="25BCE1274" 
+                        photoUrl={yashPhoto} 
                     />
                 </div>
             </section>
