@@ -17,9 +17,8 @@ from .config import config
 from .database import check_db_connection, Base, engine
 from .routers import schema_router, query_router, recommendation_router, explain_router, history_router, ai_router
 
-# Automatically initialize missing application tables (supports Aiven MySQL and SQLite)
-# Base.metadata.create_all safely uses 'CREATE TABLE IF NOT EXISTS' so it will not drop existing data.
-if engine:
+# Create tables if they don't exist (useful for dev/sqlite but we rely on manual initialization for MySQL)
+if engine and engine.url.drivername == "sqlite":
     Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
