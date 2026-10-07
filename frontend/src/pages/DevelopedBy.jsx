@@ -1,16 +1,22 @@
 import React from 'react';
 
-const StudentCard = ({ n }) => (
+import dhyeyPhoto from '../assets/dhyey.jpg';
+
+const StudentCard = ({ name, regNo, photoUrl }) => (
     <div className="dev-student-card-v2">
         <div className="dev-photo-ring-v2">
-            <div className="dev-photo-placeholder-v2">
-                <span className="dev-photo-icon-v2">👤</span>
-                <span className="dev-photo-label-v2">[Student Photo]</span>
-            </div>
+            {photoUrl ? (
+                <img src={photoUrl} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+            ) : (
+                <div className="dev-photo-placeholder-v2">
+                    <span className="dev-photo-icon-v2">👤</span>
+                    <span className="dev-photo-label-v2">[Student Photo]</span>
+                </div>
+            )}
         </div>
         <div className="dev-student-info-v2">
-            <div className="dev-student-name-v2">[Enter Student Name {n}]</div>
-            <div className="dev-student-reg-v2">[Enter Register Number]</div>
+            <div className="dev-student-name-v2">{name}</div>
+            <div className="dev-student-reg-v2">{regNo}</div>
         </div>
     </div>
 );
@@ -43,9 +49,11 @@ export default function DevelopedByPage() {
             <section className="dev-section">
                 <div className="dev-section-label">Developed By</div>
                 <div className="dev-students-row">
-                    <StudentCard n={1} />
-                    <StudentCard n={2} />
-                    <StudentCard n={3} />
+                    <StudentCard 
+                        name="Dhyey Deepak Raiyani" 
+                        regNo="25BCE1339" 
+                        photoUrl={dhyeyPhoto} 
+                    />
                 </div>
             </section>
 
