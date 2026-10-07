@@ -64,5 +64,5 @@ def check_db_connection() -> dict:
         logger.warning(f"Database connection failed: {e}")
         return {"status": "disconnected", "message": str(e)}
     except Exception as e:
-        logger.warning(f"Database connection failed: {e}")
-        return {"status": "disconnected", "message": "Unknown connection issue."}
+        logger.warning(f"Database connection failed: {repr(e)}")
+        return {"status": "disconnected", "message": f"Unknown connection issue: {repr(e)}"}
