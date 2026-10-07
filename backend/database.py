@@ -1,5 +1,6 @@
 import logging
 from sqlalchemy import create_engine
+from sqlalchemy.pool import NullPool
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.exc import OperationalError
 from .config import config
@@ -34,7 +35,7 @@ try:
         
         connect_args["ssl"] = ssl_context
     
-    engine = create_engine(DATABASE_URL, pool_pre_ping=True, pool_recycle=3600, connect_args=connect_args)
+    engine = create_engine(DATABASE_URL, poolclass=NullPool, connect_args=connect_args)
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 except Exception as e:
     logger.error(f"Failed to create engine: {e}")
