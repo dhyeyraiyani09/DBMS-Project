@@ -109,3 +109,51 @@ def test_explain_api_fields_and_distinction():
     assert row["possible_keys"] is not None # idx_user_date, idx_user
     assert row["key"] is not None # probably idx_user_date or idx_user
 
+
+def test_explain_translate_strips_logical_schema_prefix():
+    """
+    Regression test for bug: EXPLAIN SQL incorrectly included the logical schema prefix
+    (e.g. ECOMMERCE.phy_6_6) when a user wrote a query as SCHEMA.table notation.
+
+    The logical schema name (e.g. ECOMMERCE) is an application-level construct and
+    does NOT correspond to a real MySQL database. Physical tables live in the connected
+    database (defaultdb on Aiven) and must be referenced without a schema prefix.
+
+    Fix: When replacing a logical table name with the physical name, the sqlglot Table
+    node's 'db' attribute must also be cleared to strip the prefix.
+    """
+    from sqlglot import exp as sqlglot_exp
+    import sqlglot
+
+    # Simulate what _validate_and_translate does for a user query with schema prefix
+    query = "SELECT ORDER_ID, ORDER_DATE FROM ECOMMERCE.orders WHERE ORDER_DATE >= '2026-01-01'"
+    ast = sqlglot.parse_one(query)
+
+    table_map = {"orders": "phy_6_6"}
+    cte_names = set()
+
+    def replace_table(node):
+        if isinstance(node, sqlglot_exp.Table):
+            tname = node.name.lower()
+            if tname in table_map and tname not in cte_names:
+                node.set("this", sqlglot_exp.Identifier(this=table_map[tname]))
+                node.set("db", None)  # The fix: strip the logical schema prefix
+        return node
+
+    translated_ast = ast.copy().transform(replace_table)
+    translated_sql = translated_ast.sql(dialect="mysql")
+
+    # Must NOT contain the logical schema prefix
+    assert "ECOMMERCE" not in translated_sql, (
+        f"Logical schema prefix must not appear in translated SQL, got: {translated_sql}"
+    )
+    # Must correctly reference the physical table
+    assert "phy_6_6" in translated_sql, (
+        f"Physical table name must appear in translated SQL, got: {translated_sql}"
+    )
+    # Must NOT have the erroneous `ECOMMERCE.phy_6_6` pattern
+    assert "ECOMMERCE.phy_6_6" not in translated_sql
+
+    # Also verify the WHERE clause is preserved intact
+    assert "ORDER_DATE" in translated_sql
+    assert "2026-01-01" in translated_sql

@@ -52,6 +52,12 @@ class ExplainAnalyzer:
                     tname = node.name.lower()
                     if tname in table_map and tname not in cte_names:
                         node.set("this", exp.Identifier(this=table_map[tname]))
+                        # BUGFIX: also clear the logical schema/db prefix (e.g. ECOMMERCE.phy_6_6 -> phy_6_6).
+                        # When the user writes "FROM ECOMMERCE.orders", sqlglot captures the schema name
+                        # as the 'db' attribute on the Table node. After remapping to the physical table name,
+                        # this prefix must be removed — ECOMMERCE is a logical name only and is not a real
+                        # MySQL database. The physical tables all live in the connected Aiven/MySQL database.
+                        node.set("db", None)
                 return node
                 
             translated_ast = self.ast.copy().transform(replace_table)
