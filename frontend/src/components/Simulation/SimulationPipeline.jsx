@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import SimulationControls from './SimulationControls';
-import AITutor from '../AITutor/AITutor';
 
 import {
     StepSQLQuery,
@@ -101,14 +100,6 @@ export default function SimulationPipeline({ query, analysis, recommendations, s
                 {renderStep()}
             </div>
 
-            <AITutor 
-                context={{
-                    analysis,
-                    recommendation: recommendations,
-                    schema: schemaData,
-                    explain: explainData
-                }}
-            />
 
             <SimulationControls 
                 currentStep={currentStep} 

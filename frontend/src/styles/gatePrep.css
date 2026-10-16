@@ -1,0 +1,587 @@
+/* =====================================================
+   GATE PREPARATION MODULE — STYLES
+   Responsive, Dark/Light Mode Aware Design Tokens
+   ===================================================== */
+
+.gate-prep-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0.5rem 0 2rem;
+}
+
+.gate-hero {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(34, 211, 238, 0.05) 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem 2rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+}
+
+.gate-hero-text h2 {
+    margin: 0 0 0.4rem;
+    font-size: 1.45rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.gate-hero-text p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    max-width: 650px;
+}
+
+.gate-stats-bar {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.gate-stat-pill {
+    background: var(--surface-color);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 0.5rem 0.9rem;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    min-width: 80px;
+}
+
+.gate-stat-number {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1.2;
+}
+
+.gate-stat-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+}
+
+/* Formula Drawer */
+.gate-formula-drawer {
+    background: var(--surface-raised, var(--surface-color));
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+}
+
+.gate-formula-header {
+    padding: 0.85rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    background: rgba(99, 102, 241, 0.04);
+    transition: background 0.15s;
+    user-select: none;
+}
+
+.gate-formula-header:hover {
+    background: rgba(99, 102, 241, 0.08);
+}
+
+.gate-formula-header h4 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+}
+
+.gate-formula-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1rem;
+    padding: 1.25rem;
+    border-top: 1px solid var(--border);
+}
+
+.gate-formula-card {
+    background: var(--surface-color);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.9rem 1rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.gate-formula-card-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 0.35rem;
+}
+
+.gate-formula-code {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 0.45rem 0.65rem;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    margin-bottom: 0.45rem;
+    display: block;
+    overflow-x: auto;
+}
+
+.gate-formula-desc {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    line-height: 1.45;
+}
+
+/* Filters */
+.gate-filter-bar {
+    background: var(--surface-color);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    box-shadow: var(--shadow-sm);
+}
+
+.gate-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    flex: 1;
+    min-width: 150px;
+}
+
+.gate-filter-group label {
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+}
+
+.gate-filter-group select,
+.gate-filter-group input {
+    padding: 0.45rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--input-bg);
+    color: var(--input-text);
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.gate-filter-group select:focus,
+.gate-filter-group input:focus {
+    border-color: var(--accent);
+}
+
+/* Question Palette / Navigation */
+.gate-palette {
+    display: flex;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+    align-items: center;
+    padding: 0.65rem 0.85rem;
+    background: var(--surface-raised, var(--surface-color));
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+}
+
+.gate-palette-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-right: 0.5rem;
+}
+
+.gate-palette-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface-color);
+    color: var(--text-primary);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    position: relative;
+}
+
+.gate-palette-btn:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+}
+
+.gate-palette-btn.active {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+}
+
+.gate-palette-btn.correct {
+    border-color: var(--success);
+    background: rgba(16, 185, 129, 0.12);
+    color: var(--success);
+}
+
+.gate-palette-btn.incorrect {
+    border-color: var(--danger);
+    background: rgba(251, 113, 133, 0.12);
+    color: var(--danger);
+}
+
+.gate-palette-btn.bookmarked::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--warning);
+}
+
+/* Question Card */
+.gate-question-card {
+    background: var(--surface-color);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem 2rem;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 1.5rem;
+}
+
+.gate-q-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding-bottom: 1rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.gate-q-badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.gate-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+}
+
+.gate-badge-pyq {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--success);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.gate-badge-practice {
+    background: rgba(34, 211, 238, 0.15);
+    color: #0284c7;
+    border: 1px solid rgba(34, 211, 238, 0.3);
+}
+
+.gate-badge-type {
+    background: rgba(99, 102, 241, 0.12);
+    color: var(--accent);
+    border: 1px solid rgba(99, 102, 241, 0.25);
+}
+
+.gate-badge-difficulty-easy {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+}
+
+.gate-badge-difficulty-medium {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+}
+
+.gate-badge-difficulty-hard {
+    background: rgba(251, 113, 133, 0.1);
+    color: var(--danger);
+}
+
+.gate-q-source-link {
+    font-size: 0.8rem;
+    color: var(--accent);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-weight: 500;
+    transition: color 0.15s;
+}
+
+.gate-q-source-link:hover {
+    text-decoration: underline;
+    color: var(--accent-hover);
+}
+
+.gate-q-statement {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    white-space: pre-line;
+}
+
+/* Options */
+.gate-options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    margin-bottom: 1.5rem;
+}
+
+.gate-option-item {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 0.85rem 1.15rem;
+    background: var(--surface-raised, var(--surface-color));
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    user-select: none;
+}
+
+.gate-option-item:hover {
+    border-color: var(--accent);
+    background: var(--surface-color);
+}
+
+.gate-option-item.selected {
+    border-color: var(--accent);
+    background: rgba(99, 102, 241, 0.08);
+}
+
+.gate-option-item.correct-revealed {
+    border-color: var(--success);
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.gate-option-item.wrong-selected {
+    border-color: var(--danger);
+    background: rgba(251, 113, 133, 0.1);
+}
+
+.gate-option-indicator {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--border-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.gate-option-item.selected .gate-option-indicator {
+    border-color: var(--accent);
+    background: var(--accent);
+}
+
+.gate-option-indicator-inner {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ffffff;
+}
+
+.gate-option-text {
+    font-size: 0.92rem;
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+/* NAT Input */
+.gate-nat-box {
+    margin-bottom: 1.5rem;
+    padding: 1.25rem;
+    background: var(--surface-raised, var(--surface-color));
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    max-width: 400px;
+}
+
+.gate-nat-box label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+}
+
+.gate-nat-input {
+    width: 100%;
+    padding: 0.65rem 0.9rem;
+    font-size: 1.05rem;
+    font-family: 'JetBrains Mono', monospace;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--input-bg);
+    color: var(--input-text);
+    outline: none;
+    box-sizing: border-box;
+}
+
+.gate-nat-input:focus {
+    border-color: var(--accent);
+}
+
+/* Question Action Buttons */
+.gate-q-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.gate-btn {
+    padding: 0.55rem 1.15rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.gate-btn-primary {
+    background: var(--accent);
+    color: #ffffff;
+}
+
+.gate-btn-primary:hover {
+    background: var(--accent-hover);
+}
+
+.gate-btn-secondary {
+    background: var(--surface-color);
+    border-color: var(--border);
+    color: var(--text-secondary);
+}
+
+.gate-btn-secondary:hover {
+    background: var(--surface-raised);
+    color: var(--text-primary);
+}
+
+.gate-btn-outline {
+    background: transparent;
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.gate-btn-outline:hover {
+    background: rgba(99, 102, 241, 0.08);
+}
+
+/* Explanation Block */
+.gate-explanation-card {
+    background: var(--edu-note-bg, rgba(99, 102, 241, 0.05));
+    border: 1px solid var(--edu-note-border, rgba(99, 102, 241, 0.2));
+    border-left: 4px solid var(--accent);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.gate-exp-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 0 0 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.gate-exp-section {
+    margin-bottom: 1.15rem;
+}
+
+.gate-exp-section h5 {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    margin: 0 0 0.4rem;
+}
+
+.gate-exp-section p,
+.gate-exp-section pre {
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--text-primary);
+    margin: 0;
+    white-space: pre-line;
+}
+
+.gate-formula-box {
+    background: var(--surface-color);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 1rem;
+    margin-top: 0.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--accent);
+    font-weight: 600;
+}
+
+/* Navigation footer */
+.gate-nav-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+}

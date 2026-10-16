@@ -4,6 +4,7 @@ import SchemaManager from './pages/SchemaManager'
 import QueryAnalyzer from './pages/QueryAnalyzer'
 import HistoryPage from './pages/History'
 import LearnPage from './pages/Learn'
+import GatePrepPage from './pages/GatePrep'
 import HelpPage from './pages/Help'
 import DevelopedByPage from './pages/DevelopedBy'
 
@@ -47,6 +48,7 @@ function App() {
     { id: 'schema', label: 'Schema', icon: '🗄' },
     { id: 'analyzer', label: 'SQL Analyzer', icon: '🔍' },
     { id: 'learn', label: 'Learn', icon: '📖' },
+    { id: 'gate_prep', label: 'GATE Prep', icon: '🎓' },
     { id: 'history', label: 'History', icon: '📋' },
     { id: 'help', label: 'Help', icon: '❓' },
     { id: 'developed_by', label: 'Developed By', icon: '👤' },
@@ -92,10 +94,10 @@ function App() {
     },
     {
       icon: '🎓',
-      title: 'AI Tutor',
-      desc: 'Built-in educational explanations of every recommendation decision, step by step.',
-      tag: 'Education',
-      view: 'analyzer',
+      title: 'GATE Prep',
+      desc: 'Authentic GATE CSE DBMS previous-year questions with step-by-step mathematical solutions and key formulas.',
+      tag: 'GATE CSE',
+      view: 'gate_prep',
     },
   ]
 
@@ -252,6 +254,12 @@ function App() {
         {currentView === 'learn' && (
           <div className="card">
             <LearnPage />
+          </div>
+        )}
+
+        {currentView === 'gate_prep' && (
+          <div className="card">
+            <GatePrepPage />
           </div>
         )}
 
