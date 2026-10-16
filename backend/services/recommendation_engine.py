@@ -1,5 +1,7 @@
 from typing import Dict, List, Any, Tuple
 from collections import defaultdict
+import sqlglot
+from sqlglot import exp
 
 # Scoring constants based on Phase 0 heuristic
 SCORE_WHERE_EQUALITY = 30
@@ -93,12 +95,23 @@ class RecommendationEngine:
         candidates_list.sort(key=lambda x: (-x["score"], x["table"], tuple(x["columns"])))
         recommendations.sort(key=lambda x: (-x["score"], x["table"], tuple(x["columns"])))
         
+        # Dynamic selection policy:
+        # Single-table queries preserve the original top-3 recommendation limit.
+        # Multi-table queries scale up dynamically to allow up to 2 recommendations
+        # per participating table (minimum 3, capped at 10) so all relevant tables can
+        # receive recommended indexes without cluttering the response.
+        num_tables = len(set(t["name"] for t in self.analysis.get("tables", []) if t.get("name")))
+        if num_tables <= 1:
+            max_recommendations = 3
+        else:
+            max_recommendations = min(max(3, num_tables * 2), 10)
+
         return {
             "query": self.analysis.get("original_query", ""),
             "schema_id": self.schema.get("id", 0),
             "analysis_summary": self.analysis,
             "candidates": candidates_list,
-            "recommendations": recommendations[:3] # Limit to top 3 recommendations
+            "recommendations": recommendations[:max_recommendations]
         }
         
     def _add_factor(self, table: str, cols: Tuple[str, ...], category: str, points: int, reason: str):
@@ -124,6 +137,17 @@ class RecommendationEngine:
     def _resolve_table_for_col(self, col_name: str, given_table: str = None) -> str:
         """Resolve the table for a column if missing, using the analysis tables list."""
         if given_table:
+            gt_lower = given_table.lower()
+            # Match case-insensitively against aliases and table names in analysis
+            for t in self.analysis.get("tables", []):
+                t_alias = t.get("alias")
+                t_name = t.get("name")
+                if (t_alias and t_alias.lower() == gt_lower) or (t_name and t_name.lower() == gt_lower):
+                    return t_name
+            # Match case-insensitively against schema tables
+            for t_name in self.tables:
+                if t_name.lower() == gt_lower:
+                    return t_name
             return given_table
             
         valid_tables = [t["name"] for t in self.analysis.get("tables", [])]
@@ -157,26 +181,34 @@ class RecommendationEngine:
 
         for join in self.analysis.get("joins", []):
             for cond in join.get("conditions", []):
-                # cond['left'] and cond['right'] are raw expressions. 
-                # Our Phase 3 might just have them as strings.
-                # To be precise, we know from Phase 3 that joining columns are often fully qualified.
-                # Since we don't have perfect parsed join columns from Phase 3, we'll try to guess from raw string.
-                # Wait, Phase 4 should ideally use structured info.
                 left = cond.get("left", "")
                 right = cond.get("right", "")
                 
                 for side in [left, right]:
-                    parts = side.split(".")
-                    if len(parts) == 2:
-                        t_alias, c_name = parts
-                        # Resolve alias
-                        t_name = t_alias
-                        for t in self.analysis.get("tables", []):
-                            if t.get("alias") == t_alias or t.get("name") == t_alias:
-                                t_name = t["name"]
-                                break
-                        evidence[t_name]["join"].add(c_name)
-                        self._add_factor(t_name, (c_name,), "JOIN", SCORE_JOIN, f"Column {c_name} is used in a JOIN condition.")
+                    if not side:
+                        continue
+                    try:
+                        expr = sqlglot.parse_one(side, read="mysql")
+                        cols = list(expr.find_all(exp.Column))
+                        col_node = cols[0] if cols else expr
+                        c_name = getattr(col_node, "name", "")
+                        t_ref = getattr(col_node, "table", "")
+                    except Exception:
+                        clean_side = side.replace("`", "")
+                        parts = clean_side.split(".")
+                        c_name = parts[-1] if parts else clean_side
+                        t_ref = parts[-2] if len(parts) >= 2 else ""
+
+                    if not c_name:
+                        continue
+
+                    # Case-insensitive resolution of table alias/name
+                    t_name = self._resolve_table_for_col(c_name, t_ref if t_ref else None)
+                    if not t_name or t_name not in self.tables:
+                        continue
+
+                    evidence[t_name]["join"].add(c_name)
+                    self._add_factor(t_name, (c_name,), "JOIN", SCORE_JOIN, f"Column {c_name} is used in a JOIN condition.")
 
         for order in self.analysis.get("order_by", []):
             col_name = order["column"]

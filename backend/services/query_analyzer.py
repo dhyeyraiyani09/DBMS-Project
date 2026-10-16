@@ -39,6 +39,20 @@ class QueryAnalyzer:
             "limit": str(limit_val) if limit_val else None
         }
 
+    def _resolve_alias(self, table_ref: Optional[str]) -> Optional[str]:
+        if not table_ref:
+            return None
+        if table_ref in self.aliases:
+            return self.aliases[table_ref]
+        ref_lower = table_ref.lower()
+        for alias, table_name in self.aliases.items():
+            if alias.lower() == ref_lower:
+                return table_name
+        for t in self.ast.find_all(exp.Table):
+            if t.name.lower() == ref_lower:
+                return t.name
+        return table_ref
+
     def _extract_tables(self) -> List[Dict[str, str]]:
         tables = []
         for table in self.ast.find_all(exp.Table):
@@ -56,14 +70,26 @@ class QueryAnalyzer:
             col_name = col.name
             table_ref = col.table
             
-            # Resolve alias if present
-            resolved_table = self.aliases.get(table_ref, table_ref) if table_ref else None
+            # Resolve alias if present (case-insensitive)
+            resolved_table = self._resolve_alias(table_ref) if table_ref else None
             
             # Deduplicate
             col_dict = {"name": col_name, "table": resolved_table, "original_ref": table_ref}
             if col_dict not in columns:
                 columns.append(col_dict)
                 
+        # Also extract columns specified in JOIN ... USING (...)
+        for join in self.ast.find_all(exp.Join):
+            using_cols = join.args.get("using")
+            if using_cols:
+                join_table = join.this.name
+                resolved_table = self._resolve_alias(join.this.alias or join_table)
+                for u_col in using_cols:
+                    c_name = u_col.name if hasattr(u_col, "name") else str(u_col).strip('`" ')
+                    col_dict = {"name": c_name, "table": resolved_table, "original_ref": join.this.alias or join_table}
+                    if col_dict not in columns:
+                        columns.append(col_dict)
+
         return columns
 
     def _classify_predicate(self, node: exp.Expression) -> str:
@@ -100,7 +126,7 @@ class QueryAnalyzer:
             
             for col in cols:
                 table_ref = col.table
-                resolved_table = self.aliases.get(table_ref, table_ref) if table_ref else None
+                resolved_table = self._resolve_alias(table_ref) if table_ref else None
                 
                 conditions.append({
                     "column": col.name,
@@ -113,7 +139,10 @@ class QueryAnalyzer:
 
     def _extract_joins(self) -> List[Dict[str, Any]]:
         joins = []
-        for join in self.ast.find_all(exp.Join):
+        tables = list(self.ast.find_all(exp.Table))
+        join_nodes = list(self.ast.find_all(exp.Join))
+        
+        for idx, join in enumerate(join_nodes):
             join_type = join.side.upper() + " JOIN" if join.side else ("INNER JOIN" if join.kind in ("INNER", "") else "JOIN")
             table = join.this.name
             alias = join.this.alias if join.this.alias else None
@@ -130,6 +159,20 @@ class QueryAnalyzer:
                             "right": right_col[0].sql(dialect="mysql"),
                             "operator": "="
                         })
+            
+            using_clause = join.args.get("using")
+            if using_clause:
+                # Preceding table is tables[idx] since tables contains [from_table, join0_table, join1_table, ...]
+                prev_table = tables[idx] if idx < len(tables) else None
+                left_ref = (prev_table.alias or prev_table.name) if prev_table else "left"
+                right_ref = alias or table
+                for u_col in using_clause:
+                    c_name = u_col.name if hasattr(u_col, "name") else str(u_col).strip('`" ')
+                    conditions.append({
+                        "left": f"{left_ref}.{c_name}",
+                        "right": f"{right_ref}.{c_name}",
+                        "operator": "="
+                    })
             
             joins.append({
                 "join_type": join_type,
@@ -152,7 +195,7 @@ class QueryAnalyzer:
             if col:
                 col_name = col[0].name
                 table_ref = col[0].table
-                resolved_table = self.aliases.get(table_ref, table_ref) if table_ref else None
+                resolved_table = self._resolve_alias(table_ref) if table_ref else None
                 
                 orders.append({
                     "column": col_name,
@@ -173,7 +216,7 @@ class QueryAnalyzer:
             if col:
                 col_name = col[0].name
                 table_ref = col[0].table
-                resolved_table = self.aliases.get(table_ref, table_ref) if table_ref else None
+                resolved_table = self._resolve_alias(table_ref) if table_ref else None
                 
                 groups.append({
                     "column": col_name,

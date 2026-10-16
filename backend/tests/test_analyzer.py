@@ -289,3 +289,67 @@ def test_schema_aware_validation():
     # Valid table aliases & referenced through alias
     assert analyze("SELECT u.name FROM users u").status_code == 200
 
+def test_join_using_syntax():
+    analyzer = QueryAnalyzer("SELECT * FROM users u JOIN orders o USING (user_id)")
+    res = analyzer.analyze()
+    assert len(res["joins"]) == 1
+    join = res["joins"][0]
+    assert join["table"] == "orders"
+    assert join["alias"] == "o"
+    assert len(join["conditions"]) == 1
+    assert join["conditions"][0] == {"left": "u.user_id", "right": "o.user_id", "operator": "="}
+    
+    # Verify column extraction includes the USING column
+    col_names = [c["name"] for c in res["columns"]]
+    assert "user_id" in col_names
+
+def test_multi_table_chain_joins():
+    q = """
+    SELECT t1.id, t2.status, t3.amount
+    FROM t1
+    JOIN t2 ON t1.id = t2.t1_id
+    JOIN t3 ON t2.id = t3.t2_id
+    WHERE t1.status = 'ACTIVE'
+    """
+    analyzer = QueryAnalyzer(q)
+    res = analyzer.analyze()
+    assert len(res["tables"]) == 3
+    assert len(res["joins"]) == 2
+    assert res["joins"][0]["table"] == "t2"
+    assert res["joins"][1]["table"] == "t3"
+    assert len(res["where_conditions"]) == 1
+
+def test_ten_table_join_analysis():
+    # Build a 10-table join query
+    join_clauses = "\n".join([f"JOIN t{i} ON t{i-1}.id = t{i}.t{i-1}_id" for i in range(2, 11)])
+    q = f"SELECT t1.id, t10.amount FROM t1\n{join_clauses}\nWHERE t1.status = 'ACTIVE'"
+    analyzer = QueryAnalyzer(q)
+    res = analyzer.analyze()
+    assert len(res["tables"]) == 10
+    assert len(res["joins"]) == 9
+
+def test_case_insensitive_alias_resolution():
+    analyzer = QueryAnalyzer("SELECT U.name FROM users U WHERE u.age > 20 ORDER BY u.name")
+    res = analyzer.analyze()
+    assert res["where_conditions"][0]["table"] == "users"
+    assert res["order_by"][0]["table"] == "users"
+    # Column extracted should also resolve to users
+    cols = {c["name"]: c["table"] for c in res["columns"]}
+    assert cols.get("name") == "users"
+
+def test_schema_qualified_join_columns():
+    q = "SELECT * FROM ecommerce.users u JOIN ecommerce.orders o ON ecommerce.users.id = ecommerce.orders.user_id"
+    analyzer = QueryAnalyzer(q)
+    res = analyzer.analyze()
+    assert len(res["joins"]) == 1
+    cond = res["joins"][0]["conditions"][0]
+    assert cond["operator"] == "="
+    assert "ecommerce.users.id" in cond["left"] or "ecommerce.users.id" in cond["right"]
+
+def test_multi_condition_joins():
+    q = "SELECT * FROM t1 JOIN t2 ON t1.a = t2.a AND t1.b = t2.b"
+    analyzer = QueryAnalyzer(q)
+    res = analyzer.analyze()
+    assert len(res["joins"]) == 1
+    assert len(res["joins"][0]["conditions"]) == 2
+

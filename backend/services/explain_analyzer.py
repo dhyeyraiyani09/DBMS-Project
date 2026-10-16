@@ -51,6 +51,8 @@ class ExplainAnalyzer:
                 if isinstance(node, exp.Table):
                     tname = node.name.lower()
                     if tname in table_map and tname not in cte_names:
+                        orig_name = node.name
+                        orig_alias = node.alias
                         node.set("this", exp.Identifier(this=table_map[tname]))
                         # BUGFIX: also clear the logical schema/db prefix (e.g. ECOMMERCE.phy_6_6 -> phy_6_6).
                         # When the user writes "FROM ECOMMERCE.orders", sqlglot captures the schema name
@@ -58,6 +60,11 @@ class ExplainAnalyzer:
                         # this prefix must be removed — ECOMMERCE is a logical name only and is not a real
                         # MySQL database. The physical tables all live in the connected Aiven/MySQL database.
                         node.set("db", None)
+                        # If no explicit alias exists, preserve the logical table name as an alias
+                        # so that qualified column references (e.g. users.id, orders.user_id)
+                        # continue resolving correctly in multi-table queries without explicit aliases.
+                        if not orig_alias:
+                            node.set("alias", exp.TableAlias(this=exp.Identifier(this=orig_name)))
                 return node
                 
             translated_ast = self.ast.copy().transform(replace_table)

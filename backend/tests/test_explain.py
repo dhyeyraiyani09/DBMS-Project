@@ -157,3 +157,70 @@ def test_explain_translate_strips_logical_schema_prefix():
     # Also verify the WHERE clause is preserved intact
     assert "ORDER_DATE" in translated_sql
     assert "2026-01-01" in translated_sql
+
+def test_explain_translate_unaliased_multi_table():
+    """
+    Regression test: When a multi-table query does not use explicit table aliases,
+    e.g. SELECT users.name, orders.total FROM users JOIN orders ON users.id = orders.user_id
+    the physical table replacement must assign the logical table name as the alias
+    (phy_1_1 AS users, phy_1_2 AS orders). Otherwise, MySQL fails with:
+    Unknown column 'users.id' in 'on clause' / 'field list'.
+    """
+    from sqlglot import exp as sqlglot_exp
+    import sqlglot
+
+    query = "SELECT users.name, orders.total FROM users JOIN orders ON users.id = orders.user_id"
+    ast = sqlglot.parse_one(query, read="mysql")
+
+    table_map = {"users": "phy_1_1", "orders": "phy_1_2"}
+    cte_names = set()
+
+    def replace_table(node):
+        if isinstance(node, sqlglot_exp.Table):
+            tname = node.name.lower()
+            if tname in table_map and tname not in cte_names:
+                orig_name = node.name
+                orig_alias = node.alias
+                node.set("this", sqlglot_exp.Identifier(this=table_map[tname]))
+                node.set("db", None)
+                if not orig_alias:
+                    node.set("alias", sqlglot_exp.TableAlias(this=sqlglot_exp.Identifier(this=orig_name)))
+        return node
+
+    translated_sql = ast.copy().transform(replace_table).sql(dialect="mysql")
+
+    assert "phy_1_1 AS users" in translated_sql
+    assert "phy_1_2 AS orders" in translated_sql
+    assert "users.id = orders.user_id" in translated_sql
+
+def test_explain_translate_mixed_aliases():
+    """
+    When explicit alias is present on one table and absent on another,
+    explicit alias is preserved and missing alias gets logical name.
+    """
+    from sqlglot import exp as sqlglot_exp
+    import sqlglot
+
+    query = "SELECT u.name, orders.total FROM users u JOIN orders ON u.id = orders.user_id"
+    ast = sqlglot.parse_one(query, read="mysql")
+
+    table_map = {"users": "phy_1_1", "orders": "phy_1_2"}
+    cte_names = set()
+
+    def replace_table(node):
+        if isinstance(node, sqlglot_exp.Table):
+            tname = node.name.lower()
+            if tname in table_map and tname not in cte_names:
+                orig_name = node.name
+                orig_alias = node.alias
+                node.set("this", sqlglot_exp.Identifier(this=table_map[tname]))
+                node.set("db", None)
+                if not orig_alias:
+                    node.set("alias", sqlglot_exp.TableAlias(this=sqlglot_exp.Identifier(this=orig_name)))
+        return node
+
+    translated_sql = ast.copy().transform(replace_table).sql(dialect="mysql")
+
+    # u should remain u, orders should get AS orders
+    assert "phy_1_1 AS u" in translated_sql
+    assert "phy_1_2 AS orders" in translated_sql
